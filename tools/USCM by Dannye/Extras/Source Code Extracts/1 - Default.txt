@@ -1,0 +1,1840 @@
+// ====================================================================================================================
+// ULTIMATE MAIN SCM: INITIAL SECTION
+// ====================================================================================================================
+:ULTSCM
+03A4: name_thread "ULTSCM" 
+055E: set_player $PLAYER_CHAR max_health += 150 
+055F: set_player $PLAYER_CHAR max_armour += 150
+ 
+0004: $current_car                     = FALSE                                      // Variable Dec/Init
+0004: $previous_car                    = FALSE
+0004: $interested_in_previous_car      = FALSE
+0006: $car_camera_locked_onto          = FALSE
+0005: $ped_multiplier                  = 1.0                                        //  [1.0 means normal ped level, 0.0 means none aka ghosttown]
+0004: $teleport1_exists                = FALSE 
+0004: $teleport2_exists                = FALSE
+0004: $bike_teleport_north_magnet      = FALSE
+0004: $always_teleport_cut_replay      = FALSE
+0004: $stats_mode                      = 0
+0004: $time_frozen                     = TRUE 
+0004: $time_frozen_hour                = 12 
+0004: $time_frozen_minute              = 0 
+0004: $weather_type                    = 13 
+0004: $max_wanted_level                = 0 
+0004: $player_ignored                  = TRUE 
+0004: $player_invulnerable             = TRUE 
+0004: $vehicle_invulnerable            = TRUE 
+0004: $tires_vulnerable                = FALSE 
+0004: $jetpack_on                      = FALSE
+0004: $current_car_can_mod_wheels      = FALSE 
+0004: $current_car_can_mod_nos         = FALSE
+0004: $current_car_can_mod_hyrdraulics = FALSE
+                                                                                    // Some initial function calls
+039E: set_actor $PLAYER_ACTOR locked TRUE while_in_car                              // - Cannot be carjacked
+0572: toggle_taxi_nitros TRUE                                                       // - Provide access to taxi-boosting
+0330: set_player  $PLAYER_CHAR  infinite_run       TRUE                             // - Unlimited run ability
+055D: make_player $PLAYER_CHAR  fireproof          TRUE                             // - Ensures fire wont reduce health (diff to $player_invulnerable fire-proof toggle, as the latter means wont be set on fire nor react to it)
+02E2: set_actor   $PLAYER_ACTOR weapon_accuracy_to 100                              // - Perfect weapon accuracy
+
+0004: $for_quick_load_united_scm = FALSE                                            // Special Flag: Should only set to TRUE if compiling this code for use with the "GTA United" SA TC Mod
+0050: gosub @FCN_DO_UNITED_QUICK_LOAD_HELPER_IF_NESC                                //               In any other case this should stay FALSE
+
+// ====================================================================================================================
+// ULTIMATE MAIN SCM: PRIMARY LOOP
+// ====================================================================================================================
+// --- Loop Basics/Init ----------------------------------------------------------------------------------------------- 
+:ULTSCM_LOOP
+0001: wait 10 ms 
+035F: actor $PLAYER_ACTOR armour += 250                                             // Maintain constant settings
+0223: set_actor $PLAYER_ACTOR health_to 250 
+02AB: set_actor $PLAYER_ACTOR immunities BP $player_invulnerable FP $player_invulnerable EP $player_invulnerable CP $player_invulnerable MP $player_invulnerable 
+03BF: set_player $PLAYER_CHAR ignored_by_everyone $player_ignored 
+01F0: set_max_wanted_level_to $max_wanted_level 
+01EB: set_traffic_density_multiplier_to $ped_multiplier 
+03DE: set_pedestrians_density_multiplier_to $ped_multiplier
+00D6: if
+0038:   $time_frozen == TRUE
+004D: jump_if_false @LABEL_MAINTAIN_TIME_DONE
+00C0: set_current_time_hours_to $time_frozen_hour minutes_to $time_frozen_minute    // Maintain frozen-time if nesc
+:LABEL_MAINTAIN_TIME_DONE
+00D6: if 
+8038:   not $weather_type == -1
+004D: jump_if_false @LABEL_MAINTAIN_WEATHER_DONE
+01B6: set_weather $weather_type                                                     // Maintain frozen-weather if nesc
+:LABEL_MAINTAIN_WEATHER_DONE
+00D6: if 
+0256:   player $PLAYER_CHAR defined                                                 // Ensure Player available before doing anything else
+004D: jump_if_false @ULTSCM_LOOP 
+0050: gosub @FCN_DETECT_DIRECTIONAL_MOVEMENT_VIA_ANY_MEANS                          // Perform basic up/down/left/right movement detection tests (accepts keys or joystick), store as flags in local vars 8@-11@
+00D6: if
+80DF:   not actor $PLAYER_ACTOR driving                                             // Detect on-foot vs in-vehicle, and split off accordingly
+004D: jump_if_false @ULTSCM_LOOP_IN_VEHICLE
+
+// --- ON-FOOT Features Trigger Detection -----------------------------------------------------------------------------
+:ULTSCM_LOOP_ON_FOOT                                                                // [NOTE: If want to detect up/down/left/right, check for TRUE on the 8@-11@ flags, instead of opcode 00E1 with pressed_key 8-11]
+0050: gosub @FCN_SHOW_STATS_FOOT                                                    // [       This allows us to accept coresponding such movements via keyboard or joystick (+ we never override them so always avail)]
+00D6: if or                                                                         // [        The gosub call off to FCN_DETECT_DIRECTIONAL_MOVEMENT_VIA_ANY_MEANS early in our loop is what set these flags up for us]
+80E1:   not player 0 pressed_key 16 // SPRINT                                       // [NOTE: The detection process is MUCH simpler than VC (are able to get status via 00E2, which supports both keyboard + joysticks)]
+80E1:   not player 0 pressed_key 19 // LOOK BEHIND                                  
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SAVE_TELEPORT_LOCATION1_FOOT                             // Feature Triggered: TELEPORTATION [SAVE Teleport Location 1 (Foot Version)]  
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 19 // LOOK BEHIND
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SAVE_TELEPORT_LOCATION2_FOOT                             // Feature Triggered: TELEPORTATION [SAVE Teleport Location 2 (Foot Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 17 // SHOOT
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+0038:   $teleport1_exists == FALSE 
+004D: jump_if_false @LABEL_LOAD_TELEPORT_LOCATION1_FOOT                             // Feature Triggered: TELEPORTATION [LOAD Teleport Location 1 (Foot Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 17 // SHOOT
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+0038:   $teleport2_exists == FALSE 
+004D: jump_if_false @LABEL_LOAD_TELEPORT_LOCATION2_FOOT                             // Feature Triggered: TELEPORTATION [LOAD Teleport Location 2 (Foot Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 4  // ACTION
+80E1:   not player 0 pressed_key 17 // SHOOT
+80E1:   not player 0 pressed_key 5  // PREV WEAPON
+004D: jump_if_false @LABEL_WANTED_LEVEL_UP                                          // Feature Triggered: SET WANTED LEVEL UP
+00D6: if or 
+80E1:   not player 0 pressed_key 4  // ACTION
+80E1:   not player 0 pressed_key 17 // SHOOT
+80E1:   not player 0 pressed_key 7  // NEXT WEAPON
+004D: jump_if_false @LABEL_WANTED_LEVEL_DOWN                                        // Feature Triggered: SET WANTED LEVEL DOWN
+00D6: if or
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 4  // ACTION
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+004D: jump_if_false @LABEL_INTERESTED_PRIOR_CAR                                     // Fetaure Triggered: TOGGLE INTEREST IN LAST-vs-2ndLAST VEHICLE
+00D6: if or 
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 4  // ACTION
+8039:   not  8@ == TRUE             // MOVE FORWARD (keyboard or gamepad)
+004D: jump_if_false @LABEL_BIKE_TELEPORT_NORTH_MAGNET                               // Feature Triggered: TOGGLE NORTH-MAGNET OF BIKE TELEPORT LOADS
+00D6: if or 
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 4  // ACTION
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+004D: jump_if_false @LABEL_TELEPORT_LOAD_ALWAYS_REPLAY_CUT                          // Feature Triggered: TOGGLE ALWAYS-CUT-REPLAY ON TELEPORT LOADS
+00D6: if or 
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 4  // ACTION
+8039:   not  9@ == TRUE             // MOVE BACKWARD (keyboard or gamepad)
+004D: jump_if_false @LABEL_SHOW_STATS                                               // Feature Triggered: TOGGLE SHOW STATS OVERLAY
+00D6: if or
+80E1:   not player 0 pressed_key 4  // ACTION
+80E1:   not player 0 pressed_key 19 // LOOK BEHIND
+004D: jump_if_false @LABEL_WEATHER                                                  // Feature Triggered: CHANGE WEATHER
+00D6: if or
+80E1:   not player 0 pressed_key 18 // CROUCH
+80E1:   not player 0 pressed_key 13 // CAMERA
+004D: jump_if_false @LABEL_FREEZE_TIME                                              // Feature Triggered: TOGGLE FROZEN TIME
+00D6: if or
+80E1:   not player 0 pressed_key 18 // CROUCH
+80E1:   not player 0 pressed_key 19 // LOOK BEHIND
+004D: jump_if_false @LABEL_PLAYER_VULN                                              // Feature Triggered: TOGGLE PLAYER VULNERABILITIES
+00D6: if or
+80E1:   not player 0 pressed_key 18 // CROUCH
+80E1:   not player 0 pressed_key 16 // SPRINT
+004D: jump_if_false @LABEL_GHOSTTOWN                                                // Feature Triggered: TOGGLE 'GHOST TOWN'
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 6  // AIM
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SPAWNER1                                                 // Feature Triggered: VEHICLE SPAWNERS [Vehicle Spawner Set 1]
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 6  // AIM
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SPAWNER2                                                 // Feature Triggered: VEHICLE SPAWNERS [Vehicle Spawner Set 2]
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 6  // AIM
+8039:   not  8@ == TRUE             // MOVE FORWARD (keyboard or gamepad)
+004D: jump_if_false @LABEL_SPAWNER3                                                 // Feature Triggered: VEHICLE SPAWNERS [Vehicle Spawner Set 3]
+00D6: if or
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 6  // AIM
+8039:   not  9@ == TRUE             // MOVE BACKWARD (keyboard or gamepad)
+004D: jump_if_false @LABEL_SPAWNER4                                                 // Feature Triggered: VEHICLE SPAWNERS [Vehicle Spawner Set 4]
+00D6: if or 
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 17 // SHOOT
+004D: jump_if_false @LABEL_RANDOM_SPAWNER                                           // Feature Triggered: RANDOM VEHICLE SPAWNER
+00D6: if or
+80E1:   not player 0 pressed_key 6  // AIM
+80E1:   not player 0 pressed_key 19 // LOOK BEHIND
+004D: jump_if_false @LABEL_SAVE_GAME                                                // Feature Triggered: ACTIVATE SAVE GAME PROMPT
+00D6: if or 
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 5  // PREV WEAPON
+004D: jump_if_false @LABEL_LASTCAR_TAKE                                             // Feature Triggered: TAKE ME TO PRIOR CAR
+00D6: if or 
+80E1:   not player 0 pressed_key 16 // SPRINT
+80E1:   not player 0 pressed_key 7  // NEXT WEAPON
+004D: jump_if_false @LABEL_LASTCAR_BRING                                            // Feature Triggered: BRING PRIOR CAR TO ME
+00D6: if or
+80E1:   not player 0 pressed_key 14 // JUMP
+80E1:   not player 0 pressed_key 5  // PREV WEAPON
+004D: jump_if_false @LABEL_SEE_PREVIOUS_CAR                                         // Feature Triggered: GET QUICK LOOK AT PREVIOUS CAR 
+00D6: if or
+80E1:   not player 0 pressed_key 14 // JUMP
+80E1:   not player 0 pressed_key 7  // NEXT WEAPON
+004D: jump_if_false @LABEL_SEE_CURRENT_CAR                                          // Feature Triggered: GET QUICK LOOK AT CURRENT CAR
+00D6: if or 
+80E1:   not player 0 pressed_key 13 // CAMERA
+8038:   not $jetpack_on == FALSE 
+004D: jump_if_false @LABEL_JETPACK_ENABLE                                           // Feature Triggered: JETPACK
+00D6: if  
+8038:   not $jetpack_on == TRUE                                                     // If jetpack currently active, go to code which handles its operation [Detects movement, deactivation, etc]
+004D: jump_if_false @LABEL_JETPACK_ACTIVE                                           //  [This is probably good to leave at the end of the main on-foot loop here]
+0002: jump @ULTSCM_LOOP 
+
+// --- IN-VEHICLE Init/Preparation ------------------------------------------------------------------------------------
+:ULTSCM_LOOP_IN_VEHICLE
+03C0: 0@ = actor $PLAYER_ACTOR car                                                  // Get hook for current player vehicle
+0050: gosub @FCN_DETECT_BASIC_RADIO_STATION_CHANGE                                  // Does quick check of if pressing the "Prev Radio" or "Next Radio" buttons, thus a more general "Radio Change" status, and store as flag in local var 20@
+00D6: if
+803C:   not $current_car == 0@
+004D: jump_if_false @LABEL_MAINTAIN_CURRENT_VEHICLE_HEALTH                          // If current vehicle is different to the last one we recorded the player being in
+0084: $previous_car = $current_car                                                  //  - Update handle of 'previous' to match the 'old current'
+008A: $current_car = 0@                                                             //  - Update handle of 'current' to match the 'new current'
+0050: gosub @FCN_SET_CURRENT_VEHICLE_VULNERABILITIES                                //  - Set vulnerability flags of 'new current' vehicle (we dont do this constantly - rather only in this case and when flags toggled)
+0050: gosub @FCN_GET_CURRENT_VEHICLE_MOD_SUPPORT                                    //  - Set mod-support helper variables for the 'new current' vehicle (so we dont have to make redundant/repetitive tests on-the-fly when we need to know)
+:LABEL_MAINTAIN_CURRENT_VEHICLE_HEALTH
+00D6: if and 
+0038:   $vehicle_invulnerable == TRUE
+0038:   $ONMISSION == 0                                        // (Can't do this while on misssions, can cause problems [apparently])
+004D: jump_if_false @LABEL_VEHICLE_LOOP_FEATURE_TRIGGERS
+0224: set_car $current_car health_to 1000                                           // If vehicle to be invulnerable, also maintain its health at max
+
+// --- IN-VEHICLE Features Trigger Detection --------------------------------------------------------------------------
+:LABEL_VEHICLE_LOOP_FEATURE_TRIGGERS                                                // [NOTE: If want to detect up/down/left/right, check for TRUE on the 8@-11@ flags, instead of opcode 00E1 with pressed_key 8-11]
+0050: gosub @FCN_SHOW_STATS_VEHICLE                                                 // [       This allows us to accept coresponding such movements via keyboard or joystick (+ we never override them so always avail)]
+00D6: if or                                                                         // [        The gosub call off to FCN_DETECT_DIRECTIONAL_MOVEMENT_VIA_ANY_MEANS early in our loop is what set these flags up for us]
+80E1:   not player 0 pressed_key 18 // HORN                                         // [NOTE: The detection process is MUCH simpler than VC (are able to get status via 00E2, which supports both keyboard + joysticks)]
+80E1:   not player 0 pressed_key 5  // LOOK LEFT  (lleft+lright=lbehind)            
+80E1:   not player 0 pressed_key 7  // LOOK RIGHT (lleft+lright=lbehind)
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SAVE_TELEPORT_LOCATION1_CAR                              // Feature Triggered: TELEPORTATION [SAVE Teleport Location 1 (Car Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 18 // HORN
+80E1:   not player 0 pressed_key 5  // LOOK LEFT  (lleft+lright=lbehind)
+80E1:   not player 0 pressed_key 7  // LOOK RIGHT (lleft+lright=lbehind)
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+004D: jump_if_false @LABEL_SAVE_TELEPORT_LOCATION2_CAR                              // Feature Triggered: TELEPORTATION [SAVE Teleport Location 2 (Car Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 18 // HORN
+80E1:   not player 0 pressed_key 17 // SHOOT
+8039:   not  10@ == TRUE            // MOVE LEFT (keyboard or gamepad)
+0038:   $teleport1_exists == FALSE 
+004D: jump_if_false @LABEL_LOAD_TELEPORT_LOCATION1_CAR                              // Feature Triggered: TELEPORTATION [LOAD Teleport Location 1 (Car Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 18 // HORN
+80E1:   not player 0 pressed_key 17 // SHOOT
+8039:   not  11@ == TRUE            // MOVE RIGHT (keyboard or gamepad)
+0038:   $teleport2_exists == FALSE 
+004D: jump_if_false @LABEL_LOAD_TELEPORT_LOCATION2_CAR                              // Feature Triggered: TELEPORTATION [LOAD Teleport Location 2 (Car Version)]
+00D6: if or
+80E1:   not player 0 pressed_key 18 // HORN 
+8039:   not  20@ == TRUE            // RADIO (UP or DOWN)
+047A:   actor $PLAYER_ACTOR driving_bike
+020D:   car $current_car flipped /* 020D = "is car upright", hence no "not" */      // [Could instead use 01F4, which has clearer scm.ini entry, but while it does work it is more picky about what counts as being flipped]
+004D: jump_if_false @LABEL_FLIP_CAR                                                 // Feature Triggered: FLIP UPSIDEDOWN CAR ONTO WHEELS
+00D6: if or
+80E1:   not player 0 pressed_key 19 // SUBMISSION
+80E1:   not player 0 pressed_key 7  // LOOK RIGHT
+004D: jump_if_false @LABEL_CAR_COLOUR                                               // Feature Triggered: CHANGE CAR COLOURS
+00D6: if or
+80E1:   not player 0 pressed_key 19 // SUBMISSION
+80E1:   not player 0 pressed_key 5  // LOOK LEFT
+004D: jump_if_false @LABEL_CAR_VULN                                                 // Feature Triggered: TOGGLE CAR IMMUNITIES
+00D6: if or
+80E1:   not player 0 pressed_key 6 // HANDBRAKE
+8039:   not  20@ == TRUE           // RADIO (UP or DOWN)
+004D: jump_if_false @LABEL_SPOOSHCAR                                                // Feature Triggered: REMEMBER ('SPOOSH') CAR
+00D6: if or
+80E1:   not player 0 pressed_key 19 // SUBMISSION
+80E1:   not player 0 pressed_key 6  // HANDBRAKE
+0038:   $current_car_can_mod_hyrdraulics == FALSE
+004D: jump_if_false @LABEL_CAR_HYD_COMPONENT                                        // Feature Triggered: TOGGLE CAR'S INSTALLATION OF A HYDRAULICS COMPONENT (if supported)
+00D6: if or
+80E1:   not player 0 pressed_key 19 // SUBMISSION
+80E1:   not player 0 pressed_key 18 // HORN
+0038:   $current_car_can_mod_wheels == FALSE 
+004D: jump_if_false @LABEL_CAR_ORW_COMPONENT                                        // Feature Triggered: TOGGLE CAR'S INSTALLATION OF OFFROAD WHEELS (if supported)
+00D6: if or
+80E1:   not player 0 pressed_key 4 // SECONDARY FIRE (nb: normal NOS button is FIRE)
+0038:   $current_car_can_mod_nos == FALSE
+004D: jump_if_false @LABEL_APPLY_NOS                                                // Feature Triggered: FORCE-ACTIVATE A SHOT OF NOS (if supported)
+00D6: if or
+82BF:   not car $current_car sunk
+80E1:   not player 0 pressed_key 13 // CAMERA
+04A7:   actor $PLAYER_ACTOR driving_boat
+00DD:   actor $PLAYER_ACTOR driving_car_with_model #SKIMMER 
+00DD:   actor $PLAYER_ACTOR driving_car_with_model #SEASPAR 
+00DD:   actor $PLAYER_ACTOR driving_car_with_model #VORTEX 
+004D: jump_if_false @LABEL_SURFACE_UNDERWATER_CAR                                   // Feature Triggered: WARP CAR TO LAND IF IN WATER
+0002: jump @ULTSCM_LOOP
+
+// --- Related Utility Function: Detect directional movement (via keyboard or joystick) -------------------------------
+// [RETURN]  Returns, via local vars, 'pressed' status of: forward in 8@, backward in 9@, left in 10@, right in 11@ (each the same number as their *VC* 00E1 keypress equivalent, for consistency)
+:FCN_DETECT_DIRECTIONAL_MOVEMENT_VIA_ANY_MEANS
+00E2: get_player $PLAYER_CHAR key 0 state_to 0@                                     // Get Primary left-vs-right status       (for keyboards: assoc keys; for gamepads: left-joystick X-axis)
+00E2: get_player $PLAYER_CHAR key 1 state_to 1@                                     // Get Primary forward-vs-backward status (for keyboards: assoc keys; for gamepads: left-joystick Y-axis)
+0006:  8@ = FALSE                                                                   // Initially set each directional movement flag as FALSE, indicating no such movement attempt detected
+0006:  9@ = FALSE
+0006: 10@ = FALSE
+0006: 11@ = FALSE 
+:LABEL_DETECT_FORWARD_MOVEMENT                                                      // Detect each of the potential movements...
+00D6: if  
+8019:   not 1@ > -100              // MOVE FORWARD
+004D: jump_if_false @LABEL_DETECT_BACKWARD_MOVEMENT
+0006: 8@ = TRUE                                                                     //  - Forward detected, set flag to TRUE
+:LABEL_DETECT_BACKWARD_MOVEMENT
+00D6: if  
+0019:   1@ > 100                   // MOVE BACKWARD
+004D: jump_if_false @LABEL_DETECT_LEFT_MOVEMENT
+0006: 9@ = TRUE                                                                     //  - Backward detected, set flag to TRUE
+:LABEL_DETECT_LEFT_MOVEMENT
+00D6: if  
+8019:   not 0@ > -100              // MOVE LEFT
+004D: jump_if_false @LABEL_DETECT_RIGHT_MOVEMENT
+0006: 10@ = TRUE                                                                    //  - Left detected, set flag to TRUE
+:LABEL_DETECT_RIGHT_MOVEMENT
+00D6: if  
+0019:   0@ > 100                   // MOVE RIGHT
+004D: jump_if_false @LABEL_MOVEMENT_DETECTION_COMPLETE
+0006: 11@ = TRUE                                                                    //  - Right detected, set flag to TRUE
+:LABEL_MOVEMENT_DETECTION_COMPLETE
+0051: return
+
+// --- Related Utility Function: Detect Radio Station Change (in either direction) ------------------------------------
+// [RETURN] Returns, via local var, 'pressed' status of: general 'radio change' (thus radio up OR down), in 20@
+// [CONTEXT] Should only be called while IN VEHICLE
+:FCN_DETECT_BASIC_RADIO_STATION_CHANGE
+0006: 20@ = FALSE
+00D6: if or
+00E1:   player 0 pressed_key 8 
+00E1:   player 0 pressed_key 9 
+004D: jump_if_false @LABEL_BASIC_RADIO_STATION_CHANGE_COMPLETE 
+0006: 20@ = TRUE
+:LABEL_BASIC_RADIO_STATION_CHANGE_COMPLETE
+0051: return
+
+// --- Related Utility Function: Detect what types of vehicle-mods (of those we care about), if any, are supported by the current vehicle -------------------------
+// [RETURN] Returns having set the trio of assoc global vars, each being TRUE or FALSE as appropriate for the vehicle
+// [CONTEXT] To be called whenever player enters a vehicle that wasn't already their 'current' vehicle
+// [NOTE] The reason why we do this here, instead of doing each specific check on-the-fly when needed, is because this way is simpler and more efficient
+:FCN_GET_CURRENT_VEHICLE_MOD_SUPPORT
+0004: $current_car_can_mod_wheels      = FALSE                                      // Initialise our 3 tracker flags to FALSE 
+0004: $current_car_can_mod_nos         = FALSE
+0004: $current_car_can_mod_hyrdraulics = FALSE
+00D6: if and                                                                        // Do initial check to immediately rule-out fully-unsupported vehicles
+847A:   not actor $PLAYER_ACTOR driving_bike                                        //  So if detect any of these casees, we can stop (with all flags still at FALSE as desired)
+84A7:   not actor $PLAYER_ACTOR driving_boat 
+84C8:   not actor $PLAYER_ACTOR driving_flying_vehicle 
+89AE:   not actor $PLAYER_ACTOR driving_train
+8969:   not car $current_car is_big 
+8975:   not car $current_car emergency_vehicle
+004D: jump_if_false @LABEL_VEHICLE_MOD_SUPPORT_COMPLETE
+00D6: if                                                                            // Do another initial check to cover a SPECIAL CASE: Sandking will never report as supporting mods, but we want to allow it to use Hydraulics
+00DD:   actor $PLAYER_ACTOR driving_car_with_model #SANDKING                        //  So if detect this case, set the flag accordingly and can stop                                   (because it can 'in the wild' - a parked car spawn for it exists in SA that can sometimes come with Hydraulics installed)
+004D: jump_if_false @LABEL_DETECT_VEHICLE_MOD_SUPPORT
+0004: $current_car_can_mod_hyrdraulics = TRUE
+0002: jump @LABEL_VEHICLE_MOD_SUPPORT_COMPLETE
+:LABEL_DETECT_VEHICLE_MOD_SUPPORT                                                   // If doing the proper check:
+06E5: get_car $current_car possible_to_built_in_component_pool_index 0 itemID_to 1@ // - Query the current vehicle's pool of supported car mods (see carmods.dat), fetching the model number of the 1st such supported mod
+00D6: if                                                                            // - If it returns a model number (not -1) then mods are supported for this vehicle
+8039:   not 1@ == -1                                                                // - If it returns -1 then no mods are supported (the pool fills from 0 onwards, so if nothing in 1st entry, there will be an empty pool for that vehicle thus it supports NO mods)
+004D: jump_if_false @LABEL_VEHICLE_MOD_SUPPORT_COMPLETE
+0004: $current_car_can_mod_wheels      = TRUE                                       // Note that upon determining ANY form of car-mod support for the vehicle, we simply set ALL THREE flags to TRUE
+0004: $current_car_can_mod_nos         = TRUE                                       //  Technically to be proper we should specifically determine NOS and Hydraul support, by looping through the mod pool to see if a component coresps to them (#NTO_B_L/#NTO_B_S/#NTO_B_TW for NOS, #HYDRALICS for hydraulics)
+0004: $current_car_can_mod_hyrdraulics = TRUE                                       //  BUT WE DONT NEED TO! Every mod-able vehicle supports all 3! (NB: carmods.dat does not even bother listing Hydraulics as supported for each car, but support IS there and can be confirmed via the proper way noted above)
+:LABEL_VEHICLE_MOD_SUPPORT_COMPLETE                                                 //   [So much so that the only reason we even made it 3 vars instead of 1 is to cover the special Sandking case]
+0051: return
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): WARP CAR TO LAND IF IN WATER
+// ====================================================================================================================
+:LABEL_SURFACE_UNDERWATER_CAR 
+00A0: store_actor $PLAYER_ACTOR position_to 0@ 1@ 2@ 
+02C1: set 3@ 4@ 5@ car_path_coords_closest_to 0@ 1@ 2@                              // Fetch closest land-vehicle-safe coordinates to current location
+00D6: if or                                                                         // Check whether such coordinates could be determined
+8043:   not 3@ == 0.0
+8043:   not 4@ == 0.0 
+8043:   not 5@ == 0.0 
+004D: jump_if_false @LABEL_UNDERWATER_FALLBACK
+018C: play_sound 1058 at 0.0 0.0 0.0
+03E5: show_text_box 'WTRRSP'  // Water Respawn
+0009: 5@ += 1.0                                                                     // [Increase height a small amount so as to not spawn partly stuck underground (rare but possible)]
+00A1: put_actor $PLAYER_ACTOR at 3@ 4@ 5@                                           // Warp player (and thus the vehicle inside of) to this new location
+0174: 0@ = car $current_car Z_angle                                                 // [Do the car-flip trick to ensure car spawned properly on its wheels (else would spawn same as how was angled/rotated in the water)]
+0009: 0@ += 360.0
+0175: set_car $current_car z_angle_to 0@
+02EB: restore_camera_with_jumpcut 
+0373: set_camera_directly_behind_player 
+0001: wait 250 ms            
+0002: jump @ULTSCM_LOOP
+
+:LABEL_UNDERWATER_FALLBACK                                                          // If unable to get such coordinates (playing a map-mod with no Paths)
+0633: AS_actor $PLAYER_ACTOR exit_car                                               //  Instead: force player out of vehicle and enable jetpack
+0002: jump @LABEL_JETPACK_ENABLE
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): REMEMBER ('SPOOSH') CAR
+// ====================================================================================================================
+:LABEL_SPOOSHCAR
+018C: play_sound 1058 at 0.0 0.0 0.0                                                /* [NOTE: Works by destroying/recreating/replacing the current vehicle (in a way in which it will never be forgotten)] */
+03E5: show_text_box 'CARREM'  // Car Remembered
+0441: 0@ = car $current_car model                                                   // Save Car-type ObjectID
+00AA: store_car $current_car position_to 1@ 2@ 3@                                   // Save Car Position/Heading/Colours
+0174: 4@ = car $current_car z_angle 
+03F3: get_car $current_car primary_color_to 5@ secondary_color_to 6@ 
+0362: remove_actor $PLAYER_ACTOR from_car_and_place_at 1@ 2@ 3@                     // Remove Player from Car
+00A6: destroy_car $current_car                                                      // Destroy Car
+0001: wait 5 ms                                                                     // [This 'wait' may not be nesc, a holdover from old way where we looped until loaded, now poss serves no purpose]
+0247: load_model 0@ 
+038B: load_requested_models 
+00A5: 7@ = create_car 0@ at 1@ 2@ 3@                                                // Respawn the same type of car, Set to the saved Position/Heading/Colours
+0175: set_car 7@ z_angle_to 4@ 
+0229: set_car 7@ primary_color_to 5@ secondary_color_to 6@ 
+0249: release_model 0@                                                              // Intentionally NOT removing references to car (so never disappears)
+0001: wait 10 ms                                                                    // ** IMPORTANT HANDLING BUG FIX, this wait is **
+036A: put_actor $PLAYER_ACTOR in_car 7@                                             // Now put the player into the new car
+02EB: restore_camera_with_jumpcut 
+0373: set_camera_directly_behind_player 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): FLIP UPSIDEDOWN CAR ONTO WHEELS
+// ====================================================================================================================
+:LABEL_FLIP_CAR
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'CARFLP'  // Car Flipped
+0172: 0@ = actor $PLAYER_ACTOR z_angle 
+0009: 0@ += 360.0                                                                   // Perform the car flip
+0175: set_car $current_car z_angle_to 0@ 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): CHANGE CAR COLOURS
+// ====================================================================================================================
+:LABEL_CAR_COLOUR
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'CARCOL'  // New Paintjob
+0209: 1@ = random_int_in_ranges 0 126                                               // Pick random primary colour
+0209: 2@ = random_int_in_ranges 0 126                                               // Pick random secondary colour
+0229: set_car $current_car primary_color_to 1@ secondary_color_to 2@ 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): TOGGLE CAR IMMUNITIES
+// ====================================================================================================================
+:LABEL_CAR_VULN
+018C: play_sound 1058 at 0.0 0.0 0.0                                                /* [Note: The state of these flags will be applied to the current player vehicle when changed here, AND ALSO will be applied] */
+00D6: if                                                                            /* [       in the main loop, but only for specific instances where we note that the player has entered a new current vehicle] */
+0038:   $vehicle_invulnerable == FALSE                                              /* [Note:  (And thus) No prior vehicle will ever be updated in accordance with modified flags here until player re-enters it] */
+004D: jump_if_false @LABEL_CAR_VULN_OFF 
+03E5: show_text_box 'VULN1'  // Invulnerable
+0004: $vehicle_invulnerable = TRUE                                                  // Set flags to have Car/Tires as Invulnerable
+0004: $tires_vulnerable = FALSE
+0050: gosub @FCN_SET_CURRENT_VEHICLE_VULNERABILITIES                                // Run function to apply these updated flags to the current vehicle
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_CAR_VULN_OFF
+03E5: show_text_box 'VULN2'  // Vulnerable
+0004: $vehicle_invulnerable = FALSE                                                 // Set flags to have Car/Tires as Vulnerable
+0004: $tires_vulnerable = TRUE
+0050: gosub @FCN_SET_CURRENT_VEHICLE_VULNERABILITIES                                // Run function to apply these updated flags to the current vehicle
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Related Utility Function: Set/Update Vuln Flags for Current Vehicle --------------------------------------------
+// [CONTEXT] To be called whenever player enters a vehicle that wasn't already their 'current' vehicle, or whenever the vehicle vulnerability setting is toggled
+:FCN_SET_CURRENT_VEHICLE_VULNERABILITIES 
+00D6: if 
+0038:   $ONMISSION == 1                                        // (Can't do this while on misssions, can cause problems [apparently])
+004D: jump_if_false @LABEL_SET_CURRENT_VEHICLE_VULNERABILITIES_NOW
+0051: return
+:LABEL_SET_CURRENT_VEHICLE_VULNERABILITIES_NOW
+053F: set_car $current_car tires_vulnerability $tires_vulnerable                    // Function will set vulnerability flags for current vehicle
+00D6: if                                                                            //  - If in a tank, be careful to ensure even if supposed to be VULNERABLE, that is still INVULNERABLE to explosions, as tanks should be
+80DE:   not player $PLAYER_CHAR driving_vehicle_type #RHINO                         
+004D: jump_if_false @LABEL_SET_CURRENT_TANK_VULNERABILITIES
+02AC: set_car $current_car immunities BP $vehicle_invulnerable FP $vehicle_invulnerable EP $vehicle_invulnerable CP $vehicle_invulnerable MP $vehicle_invulnerable 
+0051: return
+:LABEL_SET_CURRENT_TANK_VULNERABILITIES
+02AC: set_car $current_car immunities BP TRUE FP $vehicle_invulnerable EP TRUE CP $vehicle_invulnerable MP $vehicle_invulnerable 
+0051: return
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): TOGGLE CAR'S INSTALLATION OF A HYDRAULICS COMPONENT (if supported, which has been already confirmed before calling here)
+// ====================================================================================================================
+:LABEL_CAR_HYD_COMPONENT
+00D6: if                                                                            // Check if car already has HYDRAULICS (note is simple as this check has its own dedicated opcode, vs needing to use 096D to compare slot 9 model to #HYDRALICS)
+8803:   not car $current_car have_hydraulics 
+004D: jump_if_false @LABEL_CAR_HYD_COMPONENT_UNINSTALL                              // If it does, then HYDRAULICS is already installed, so we're going to uninstall it
+0002: jump @LABEL_CAR_HYD_COMPONENT_INSTALL                                         // If does not, then we want to install it
+
+:LABEL_CAR_HYD_COMPONENT_INSTALL
+018C: play_sound 1058 at 0.0 0.0 0.0
+03E5: show_text_box 'HYDON'  // Hydraulics Installed
+07FF: set_car $current_car hydraulics TRUE                                          // Install the HYDRAULICS component (note is simpler than normal component install process due to dedicated opcodes for hydraulics)
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_CAR_HYD_COMPONENT_UNINSTALL
+018C: play_sound 1058 at 0.0 0.0 0.0
+03E5: show_text_box 'HYDOF'  // Hydraulics Removed 
+07FF: set_car $current_car hydraulics FALSE                                         // Remove the HYDRAULICS component (note is simpler than normal component removal process due to dedicated opcodes for hydraulics)
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): TOGGLE CAR'S INSTALLATION OF OFF-ROAD-WHEELS (if supported, which has been already confirmed before calling here)
+// ====================================================================================================================
+:LABEL_CAR_ORW_COMPONENT
+096D: get_car $current_car component_on_slot 12 model_to 1@                         // Gets model number of the component installed in the car's mod slot (slot 12 being used for Wheels; can confirm via 06E6)
+00D6: if
+8039:   not 1@ == #WHEEL_OR1
+004D: jump_if_false @LABEL_CAR_ORW_COMPONENT_UNINSTALL                              // If returns a model num matching Off Road Wheels, then they are already installed, so we're going to uninstall them
+0002: jump @LABEL_CAR_ORW_COMPONENT_INSTALL                                         // Otherwise, we want to install them
+
+:LABEL_CAR_ORW_COMPONENT_INSTALL
+018C: play_sound 1058 at 0.0 0.0 0.0
+03E5: show_text_box 'ORWON'  // Off-Road Wheels Installed 
+06E9: load_car_component #WHEEL_OR1 
+038B: load_requested_models 
+06E7: 0@ = add_car_component #WHEEL_OR1 to_car $current_car                          // Install Off Road Wheels into the car which we now know supports it
+06EB: release_car_component #WHEEL_OR1
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_CAR_ORW_COMPONENT_UNINSTALL
+018C: play_sound 1058 at 0.0 0.0 0.0
+03E5: show_text_box 'ORWOF'  // Off-Road Wheels Removed
+06E8: car $current_car destroy_component 1@                                         // Remove the NOS component we found installed in the coresp mod slot
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (IN VEHICLE): FORCE-ACTIVATE A SHOT OF NOS (if supported, which has already been confirmed before calling here)
+//                       [Note we dont require the vehicle officially has the NOS Component installed (infact will get less issues if DONT have it), only that the vehicle SUPPORTS having it]
+// ====================================================================================================================
+:LABEL_APPLY_NOS
+09E9: car $current_car set_single_nitro                                             // [NB: The kind of issues with the USCM if have the proper NOS Component installed are as follows (which NB are true for being in Taxi's where it is automatically-installed)]
+0001: wait 250 ms                                                                   // [    1. If you decide to trigger a NOS-shot via THIS feature, instead of normal-game way, the NOS Component will automatically remove itself upon NOS-shot completion (game quirk)]
+0002: jump @ULTSCM_LOOP                                                             // [    2. Any in-car USCM features that use 'Shoot' as trigger will also initiate NOS (button conflict), also foot-to-car teleport load does too (even if trigger doesnt involve 'Shoot' - game quirk?)]
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TAKE ME TO PRIOR CAR + BRING PRIOR CAR TO ME
+// ====================================================================================================================
+:LABEL_LASTCAR_TAKE                                                                 // Take Player to Last Car
+0050: gosub @FCN_GET_DESIRED_USABLE_PRIOR_VEHICLE_HOOK_TO_LOCAL                     // - Gets hook of desired 'prior' vehicle (last/current vs 2nd-last), IF exist and still appropriate for use, puts it in 4@
+00D6: if
+8039:   not 4@ == FALSE
+004D: jump_if_false @ULTSCM_LOOP
+018C: play_sound 1058 at 0.0 0.0 0.0                                                 // - If prior vehicle IS available for use, continue...
+0174: 0@ = car 4@ Z_angle 
+0407: store_coords_to 1@ 2@ 3@ from_car 4@ with_offset 0.0 -9.0 0.0 
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@ 
+0173: set_actor $PLAYER_ACTOR Z_angle_to 0@ 
+02EB: restore_camera_with_jumpcut 
+0373: set_camera_directly_behind_player 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_LASTCAR_BRING                                                                // Bring Last Car to Player
+0050: gosub @FCN_GET_DESIRED_USABLE_PRIOR_VEHICLE_HOOK_TO_LOCAL                     // - Gets hook of desired 'prior' vehicle (last/current vs 2nd-last), IF exist and still appropriate for use, puts it in 4@
+00D6: if
+8039:   not 4@ == FALSE
+004D: jump_if_false @ULTSCM_LOOP
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // - If prior vehicle IS available for use, continue...
+0172: 0@ = actor $PLAYER_ACTOR Z_angle 
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 9.0 -1.0 
+00AB: put_car 4@ at 1@ 2@ 3@ 
+0175: set_car 4@ Z_angle_to 0@ 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): GET QUICK LOOK AT PREVIOUS CAR + GET QUICK LOOK AT CURRENT CAR
+// ====================================================================================================================                              
+:LABEL_SEE_PREVIOUS_CAR
+0050: gosub @FCN_GET_SPECIFIC_USABLE_PREVIOUS_VEHICLE_HOOK_TO_LOCAL                  // Gets hook of specific PREVIOUS (aka 2nd-last) vehicle, IF exist and still appropriate for use, puts it in 4@
+0002: jump @LABEL_SEE_MY_CAR
+
+:LABEL_SEE_CURRENT_CAR
+0050: gosub @FCN_GET_SPECIFIC_USABLE_CURRENT_VEHICLE_HOOK_TO_LOCAL                   // Gets hook of specific CURRENT (aka last) vehicle, IF exist and still appropriate for use, puts it in 4@
+0002: jump @LABEL_SEE_MY_CAR
+
+:LABEL_SEE_MY_CAR
+00D6: if or
+0039:   4@ == FALSE                                                                 // IF desired vehicle IS available for use
+003C:   $car_camera_locked_onto == 4@                                               // AND we aren't ALREADY DOING a SEE on that vehicle
+004D: jump_if_false @LABEL_ACTIVATE_NEW_SEE_CAR                                     // THEN we will enable a SEE on that vehicle
+00D6: if                                                                            // OTHERWISE (thus vehicle unavail and/or already looking at it)...
+8038:   not $car_camera_locked_onto == FALSE
+004D: jump_if_false @LABEL_SEE_MY_CAR_DONE                                          // IF *definitely* aren't looking at one, quietly do nothing
+0004: $car_camera_locked_onto = FALSE                                               // ELSE if *might* be looking at one, ensure we (quietly) DISABLE any existing one 
+02EB: restore_camera_with_jumpcut                                                   // (either way, nothing significant is done)
+0373: set_camera_directly_behind_player                                             // [NB: reason for *might* here = its possible some other scm/in-game action could reset the camera without clearing the flag]
+0002: jump @LABEL_SEE_MY_CAR_DONE                                                   // [   (while we could try to cover every uscm event that does this, ensuring we get this flag cleared every time, it is not)]
+                                                                                    // [   ( really worth the effort, as will still be other times we can't catch; and of note, the 'worst case' scenario for it)] 
+:LABEL_ACTIVATE_NEW_SEE_CAR                                                         // [   (   with this approach, is an enable wont work and have to do it a second time to work {and this prob wont be common})]
+018C: play_sound 1058 at 0.0 0.0 0.0
+008A: $car_camera_locked_onto = 4@                                                  // Set our flag to track the handle of the vehicle we are triggering this on
+0158: camera_on_car 4@ mode 18 switchstyle 2                                        // Change over to 'vehicle camera' on that vehicle
+0002: jump @LABEL_SEE_MY_CAR_DONE                                                   //  [behaves same as said camera when properly driving vehicles; in 3rd-person view (at whichever distance used when last driving in 3rd person)]
+                                                                                    //  [note: cannot change distance on-the-fly, but can even trigger lookleft (via prevweap), lookright (via nextweap), and lookbehind (via both)] 
+:LABEL_SEE_MY_CAR_DONE
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE INTEREST IN LAST-vs-2ndLAST VEHICLE
+// ====================================================================================================================
+:LABEL_INTERESTED_PRIOR_CAR
+018C: play_sound 1058 at 0.0 0.0 0.0
+00D6: if
+0038:   $interested_in_previous_car == FALSE
+004D: jump_if_false @LABEL_INTERESTED_CURRENT_CAR
+03E5: show_text_box 'FTCARP'  // Foot-Vehicle Actions use 2nd-Last Vehicle
+0004: $interested_in_previous_car = TRUE                                            // Set flag to indicate our interested in our 2nd-last vehicle
+0001: wait 250 ms                                                                   //  [will be used by any ON-FOOT features that involve a prior vehicle (teleport, bring2me, takeme2)] 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_INTERESTED_CURRENT_CAR
+03E5: show_text_box 'FTCARC'  // Foot-Vehicle Actions use Last Vehicle
+0004: $interested_in_previous_car = FALSE                                           // Set flag to indicate our interested in our last/current vehicle
+0001: wait 250 ms                                                                   //  [will be used by any ON-FOOT features that involve a prior vehicle (teleport, bring2me, takeme2)]
+0002: jump @ULTSCM_LOOP
+
+// --- Related Utility Function: Get hook of desired 'prior vehicle' (last/2ndlast) if exists/usable ---------------
+// [CONTEXT] SHOULD only be called while ON-FOOT (harmless otherwise, but pointless too)
+// [RETURN]  Returns the vehicle hook in local var 4@ [set to FALSE if doesn't exist or unusable]
+:FCN_GET_DESIRED_USABLE_PRIOR_VEHICLE_HOOK_TO_LOCAL
+0006: 4@ = $current_car                                                             // Start by putting LAST CAR hook into our local var
+00D6: if                                                                            // But if prior-vehicle-preference says to use SECOND LAST CAR, put that hook into our var instead
+0038:   $interested_in_previous_car == TRUE                                                 
+004D: jump_if_false @LABEL_ENSURE_PRIOR_VEHICLE_USABLE
+0006: 4@ = $previous_car
+:LABEL_ENSURE_PRIOR_VEHICLE_USABLE
+00D6: if
+8039:   not 4@ == FALSE                                                             // If hook says FALSE, we know of no such vehicle, then stop and return with the FALSE
+004D: jump_if_false @LABEL_PRIOR_VEHICLE_DONE
+00D6: if and                                                                        // If have got a hook, but the assoc car no longer exists or is destroyed, then we will override our var to be FALSE
+0119:   car 4@ wrecked                                                              //  (this is an AND with 'not sunk', because we want to accept underwater vehicles, which get flagged as 'wrecked' by 0119)
+82BF:   not car 4@ sunk 
+004D: jump_if_false @LABEL_CONFIRM_NOT_UNDERWATER_WRECK
+0006: 4@ = FALSE
+0051: return
+:LABEL_CONFIRM_NOT_UNDERWATER_WRECK                                                 // However, because we dont want to accept a vehicle that was both underwater AND wrecked (which earlier condition would allow)
+00D6: if                                                                            //  We must confirm it still has health left, and if IT DOESNT, then we will override our var to be FALSE
+8185:   not car 4@ health >= 10                                                     
+004D: jump_if_false @LABEL_PRIOR_VEHICLE_DONE                                       // Otherwise, we have a hook and are happy to use it, so will end up returning with it as-is
+0006: 4@ = FALSE
+:LABEL_PRIOR_VEHICLE_DONE
+0051: return
+
+:FCN_GET_SPECIFIC_USABLE_CURRENT_VEHICLE_HOOK_TO_LOCAL
+0006: 4@ = $current_car
+0002: jump @LABEL_ENSURE_PRIOR_VEHICLE_USABLE
+
+:FCN_GET_SPECIFIC_USABLE_PREVIOUS_VEHICLE_HOOK_TO_LOCAL
+0006: 4@ = $previous_car
+0002: jump @LABEL_ENSURE_PRIOR_VEHICLE_USABLE
+
+:FCN_GET_ACTIVE_ELSE_DESIRED_USABLE_VEHICLE_HOOK_TO_LOCAL
+00D6: if
+00DF:   actor $PLAYER_ACTOR driving
+004D: jump_if_false @FCN_GET_DESIRED_USABLE_PRIOR_VEHICLE_HOOK_TO_LOCAL
+0006: 4@ = $current_car
+0051: return
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE NORTH-MAGNET OF BIKE TELEPORT LOADS
+// ====================================================================================================================
+:LABEL_BIKE_TELEPORT_NORTH_MAGNET
+018C: play_sound 1058 at 0.0 0.0 0.0
+00D6: if
+0038:   $bike_teleport_north_magnet == FALSE
+004D: jump_if_false @LABEL_BIKE_TELEPORT_NORTH_MAGNET_OFF
+03E5: show_text_box 'SNORON'  // Bike Teleport-Load North-Snap Enabled
+0004: $bike_teleport_north_magnet = TRUE                                            // Set flag to indicate our desire to have bike-based teleport loads snap-to-north when close to it
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_BIKE_TELEPORT_NORTH_MAGNET_OFF
+03E5: show_text_box 'SNOROF'  // Bike Teleport-Load North-Snap Disabled
+0004: $bike_teleport_north_magnet = FALSE                                           // Set flag to indicate our desire to no longer have this snap-to-north behaviour
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE ALWAYS-CUT-REPLAY ON TELEPORT LOADS
+// ====================================================================================================================
+:LABEL_TELEPORT_LOAD_ALWAYS_REPLAY_CUT
+018C: play_sound 1058 at 0.0 0.0 0.0
+00D6: if
+0038:   $always_teleport_cut_replay == FALSE
+004D: jump_if_false @LABEL_TELEPORT_LOAD_ALWAYS_REPLAY_CUT_OFF
+03E5: show_text_box 'TPCUTY'  // ALL Teleport-Loads Clear Replay Buffer
+0004: $always_teleport_cut_replay = TRUE                                            // Set flag to indicate our desire to have teleport loads always trigger a replay-cut
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_TELEPORT_LOAD_ALWAYS_REPLAY_CUT_OFF
+03E5: show_text_box 'TPCUTN'  // ONLY Foot-to-Car Teleport-Loads Clear Replay Buffer
+0004: $always_teleport_cut_replay = FALSE                                           // Set flag to indicate our desire to no longer have this always-cut behaviour
+0001: wait 250 ms                                                                   //  [and rather, just the default behaviour of only doing the cut on foot2car loads]
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE SHOW STATS OVERLAY
+// ====================================================================================================================
+:LABEL_SHOW_STATS
+018C: play_sound 1058 at 0.0 0.0 0.0
+00D6: if
+8038:   not $stats_mode == 0
+004D: jump_if_false @LABEL_SHOW_STATS_MODE1
+00D6: if
+8038:   not $stats_mode == 1
+004D: jump_if_false @LABEL_SHOW_STATS_MODE2
+00D6: if
+8038:   not $stats_mode == 2
+004D: jump_if_false @LABEL_SHOW_STATS_MODE3
+00D6: if
+8038:   not $stats_mode == 3
+004D: jump_if_false @LABEL_SHOW_STATS_MODE4
+0002: jump @LABEL_SHOW_STATS_MODE0
+
+:LABEL_SHOW_STATS_MODE0                                                             // Mode 0 = OFF
+03E5: show_text_box 'STATS0'  // Stats Overlay OFF
+0004: $stats_mode = 0
+03F0: enable_text_draw 0 
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SHOW_STATS_MODE1                                                             // Mode 1 = ON with EVERYTHING, SPLIT
+03E5: show_text_box 'STATS1'  // Stats Overlay ON (Everything, Split)
+0004: $stats_mode = 1
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SHOW_STATS_MODE2                                                             // Mode 2 = ON with EVERYTHING, SIDEBAR
+03E5: show_text_box 'STATS2'  // Stats Overlay ON (Everything, Sidebar)
+0004: $stats_mode = 2
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SHOW_STATS_MODE3                                                             // Mode 3 = ON with SPEED-ONLY, MIDDLE
+03E5: show_text_box 'STATS3'  // Stats Overlay ON (Speed-only, Middle)
+0004: $stats_mode = 3
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SHOW_STATS_MODE4                                                             // Mode 4 = ON with SPEED-ONLY, BOTTOM
+03E5: show_text_box 'STATS4'  // Stats Overlay ON (Speed-only, Bottom)
+0004: $stats_mode = 4
+03F0: enable_text_draw 0 
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+// --- Related Utility Function: Display curent X/Y/Z/A of player on screen, if desired -------------------------------
+// [CONTEXT] Called early-on in each loop (foot and car - each calling the approp code below)
+// [NOTE]    Does nothing if the associated toggle is not enabled
+:FCN_SHOW_STATS_FOOT
+00D6: if
+8038:   not $stats_mode == 0
+004D: jump_if_false @LABEL_SHOW_STATS_DONE
+00A0: store_actor $PLAYER_ACTOR position_to 12@ 13@ 14@
+0172: 15@ = actor $PLAYER_ACTOR Z_angle
+0002: jump @LABEL_SHOW_STATS_NOW
+
+:FCN_SHOW_STATS_VEHICLE
+00D6: if
+8038:   not $stats_mode == 0
+004D: jump_if_false @LABEL_SHOW_STATS_DONE
+00AA: store_car $current_car position_to 12@ 13@ 14@
+0174: 15@ = car $current_car Z_angle
+0002: jump @LABEL_SHOW_STATS_NOW
+
+:LABEL_SHOW_STATS_NOW                                                               // [Now have an Xpos in 13@, Ypos in 14@, Zpos in 15@, angle in 16@; ALL FLOATS]
+00D6: if
+8038:   not $stats_mode == 4
+004D: jump_if_false @LABEL_SHOW_VEHICLE_STATS                                       // [If Mode == 4 we only need Vehicle Stats (and dont need text_draw), so jump straight there]
+03F0: enable_text_draw 1                                                            // [Otherwise we do need text_draw, so ensure it is enabled]
+00D6: if
+8038:   not $stats_mode == 3
+004D: jump_if_false @LABEL_SHOW_VEHICLE_STATS                                       // [If Mode == 3 we only need Vehicle Stats, so jump straight there]
+0002: jump @LABEL_SHOW_LOCATION_STATS                                               // [If Mode == 1/2 we want Location Stats too, so continue onto them (will run onto Vehicle Stats afterwards)]
+
+:LABEL_SHOW_LOCATION_STATS                  // -- Location Stats (if desired) ----------------------------------------
+0050: gosub @FCN_STATS_UGLY_NEG0_TRACKER
+0092: 16@ = float 12@ to_integer                                                    // 1. Let 16@-19@ be X/Y/Z/A in integers, respectively
+0092: 17@ = float 13@ to_integer           
+0092: 18@ = float 14@ to_integer     // Plan: Split the X and Y floats into //       
+0092: 19@ = float 15@ to_integer     //        2 integers each, 1 for their //      
+0093: 26@ = integer 16@ to_float     //        before-decimal value, 1 for  //      // 2. Let 26@-27@ be X/Y as floats again (but based off their int versions, all ?.0)
+0093: 27@ = integer 17@ to_float     //        after-decimal value (2dps),  //      
+0063: 12@ -= 26@                     //        taking 4slots in our display //      // 3. Subtract the int portion of X/Y from their original values (thus just left with 0.?)  
+0063: 13@ -= 27@                     //       Since only got 6 avail slots, //
+0013: 12@ *= 100.0                   //        we show Z and A as ints only //      // 4. Multiply these decimal-only X/Ys by 100 (thus their 2 most signif decimal values are now before the decimal)  
+0013: 13@ *= 100.0
+0092: 26@ = float 12@ to_integer                                                    // 5. Let 26@-27@ now be those modified X/Ys as integers (thus any remaining decimal values chopped off) 
+0092: 27@ = float 13@ to_integer
+0095: make 26@ absolute_integer                                                     // 6. Ensure these values are always positive
+0095: make 27@ absolute_integer
+0050: gosub @FCN_STATS_UGLY_LOCATION_DISPLAY
+
+:LABEL_SHOW_VEHICLE_STATS                  // -- Vehicle Stats (if approp/desired) ----------------------------------- 
+0050: gosub @FCN_GET_ACTIVE_ELSE_DESIRED_USABLE_VEHICLE_HOOK_TO_LOCAL
+00D6: if
+8039:  not 4@ == FALSE                                                              // IF currently in-vehicle, or on-foot w/ desired-vehicle available for use
+004D: jump_if_false @LABEL_SHOW_STATS_DONE
+
+:LABEL_SHOW_VEHICLE_STATS_SPEED                     // SPEED (always desired)
+02E3: 16@ = car 4@ speed                                                            //  - Prep1.  Get current speed in 'map points (~ meters) per second'
+0013: 16@ *= 3.6                                                                    //  - Prep2.  Convert to km/h
+00D6: if
+8424:  not is_system_metric
+004D: jump_if_false @LABEL_SHOW_VEHICLE_STATS_SPEED_CONTINUE
+0017: 16@ /= 1.609                                                                  //  - Prep2b. Convert to mp/h (if approp)
+:LABEL_SHOW_VEHICLE_STATS_SPEED_CONTINUE
+0092: 26@ = float 16@ to_integer                                                    //  - Prep3.  Convert to int
+00D6: if
+8038:   not $stats_mode == 3
+004D: jump_if_false @LABEL_SHOW_VEHICLE_STATS_SPEED_MID
+00D6: if
+8038:   not $stats_mode == 4
+004D: jump_if_false @LABEL_SHOW_VEHICLE_STATS_SPEED_BOT
+:LABEL_SHOW_VEHICLE_STATS_SPEED_SIDE                                                //  - Display (in one of the 3 possible positions/approaches)
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045A: draw_text_1number 480.0 200.0 GXT 'STSPD' number 26@  // Speed ~1~                       // Modes 1 + 2
+0002: jump @LABEL_SHOW_VEHICLE_STATS_HEALTH
+:LABEL_SHOW_VEHICLE_STATS_SPEED_MID
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045A: draw_text_1number 306.0 292.0 GXT 'STSPD' number 26@  // Speed ~1~                       // Mode 3
+0002: jump @LABEL_SHOW_VEHICLE_STATS_HEALTH
+:LABEL_SHOW_VEHICLE_STATS_SPEED_BOT
+01E4: show_text_1number_lowpriority GXT 'STSPD' number 26@ time 50 flag 1  // Speed ~1~        // Mode 4
+0002: jump @LABEL_SHOW_VEHICLE_STATS_HEALTH
+
+:LABEL_SHOW_VEHICLE_STATS_HEALTH                   // HEALTH (if desired)
+00D6: if
+001A:   3 > $stats_mode
+004D: jump_if_false @LABEL_SHOW_STATS_DONE
+0227: 17@ = car 4@ health                                                           //  - Prep1. Get current health (as float)
+0092: 27@ = float 17@ to_integer                                                    //  - Prep2. Convert to int
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045A: draw_text_1number 480.0 220.0 GXT 'STHEA'  number 17@  // Health ~1~          //  - Display
+                                                                         
+:LABEL_SHOW_STATS_DONE                     // Stats Done
+0051: return
+
+// [FUNCTION IN FUNCTION: Just to hide away some of the mess thats involved here; should ONLY be called as part of main stat function above]
+// [ PURPOSE: Set flags 0@/1@ for whether 12@/13@ are negative-zero numbers ("-0.x") or not; important for later display where we'll end up losing such negatives (when they are converted to ints)]
+:FCN_STATS_UGLY_NEG0_TRACKER
+0006: 0@ = FALSE
+0006: 1@ = FALSE
+:LABEL_STATS_UGLY_NEG0_TRACKER_X
+00D6: if and
+0021:   12@ > -1.0 
+8031:   not 12@ >= 0.0 
+004D: jump_if_false @LABEL_STATS_UGLY_NEG0_TRACKER_Y
+0006: 0@ = TRUE
+:LABEL_STATS_UGLY_NEG0_TRACKER_Y
+00D6: if and
+0021:   13@ > -1.0 
+8031:   not 13@ >= 0.0 
+004D: jump_if_false @LABEL_STATS_UGLY_NEG0_TRACKER_DONE
+0006: 1@ = TRUE
+:LABEL_STATS_UGLY_NEG0_TRACKER_DONE
+0051: return
+
+// [FUNCTION IN FUNCTION: Just to hide away some of the mess thats involved here; should ONLY be called as part of main stat function above]
+// [ PURPOSE: Doing the final location numbers display, with special handling to cover the negative-zero cases properly, thus 4 possible outputs]
+:FCN_STATS_UGLY_LOCATION_DISPLAY
+00D6: if
+0038:   $stats_mode == 1
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_CHECK_XYNEG0
+00D6: if and
+0039:   0@ == TRUE
+0039:   1@ == TRUE
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_CHECK_YNEG0
+0308: show_text_6numbers GXT 'CJSTAT1' numbers 16@ 26@ 17@ 27@ 18@ 19@ time 50 flag 1 // Xpos: -~1~.~1~, Ypos: -~1~.~1~, Zpos: ~1~, Angle: ~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_CHECK_YNEG0
+00D6: if and
+0039:   0@ == FALSE
+0039:   1@ == TRUE
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_CHECK_XNEG0
+0308: show_text_6numbers GXT 'CJSTAT2' numbers 16@ 26@ 17@ 27@ 18@ 19@ time 50 flag 1 // Xpos: ~1~.~1~, Ypos: -~1~.~1~, Zpos: ~1~, Angle: ~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_CHECK_XNEG0
+00D6: if and
+0039:   0@ == TRUE
+0039:   1@ == FALSE
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIMPLE
+0308: show_text_6numbers GXT 'CJSTAT3' numbers 16@ 26@ 17@ 27@ 18@ 19@ time 50 flag 1 // Xpos: -~1~.~1~, Ypos: ~1~.~1~, Zpos: ~1~, Angle: ~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIMPLE
+0308: show_text_6numbers GXT 'CJSTAT4' numbers 16@ 26@ 17@ 27@ 18@ 19@ time 50 flag 1 // Xpos: ~1~.~1~, Ypos: ~1~.~1~, Zpos: ~1~, Angle: ~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_XTEST
+00D6: if
+0039:   0@ == TRUE
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_XPOS
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_XNEG
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045B: draw_text_2numbers 480.0 240.0 GXT 'CJSTATB'  number 16@ 26@ // Xpos: -~1~.~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_YTEST
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_XPOS
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045B: draw_text_2numbers 480.0 240.0 GXT 'CJSTATX'  number 16@ 26@ // Xpos: ~1~.~1~
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_YTEST
+00D6: if
+0039:   1@ == TRUE
+004D: jump_if_false @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_YPOS
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_YNEG
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045B: draw_text_2numbers 480.0 260.0 GXT 'CJSTATC'  number 17@ 27@ // Ypos: -~1~.~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_REMAINDER
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_YPOS
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045B: draw_text_2numbers 480.0 260.0 GXT 'CJSTATY'  number 17@ 27@ // Ypos: ~1~.~1~
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_SIDEBAR_REMAINDER
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045A: draw_text_1number 480.0 280.0 GXT 'CJSTATZ'  number 18@  // Zpos: ~1~
+0343: set_text_draw_linewidth 640.0
+033F: set_text_draw_letter_size 0.60 1.5
+045A: draw_text_1number 480.0 300.0 GXT 'CJSTATA'  number 19@  // Angle: ~1~
+0002: jump @LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+
+:LABEL_STATS_UGLY_LOCATION_DISPLAY_DONE
+0051: return
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE 'GHOST TOWN'
+// ====================================================================================================================
+:LABEL_GHOSTTOWN
+00D6: if 
+0042:  $ped_multiplier == 1.0
+004D: jump_if_false @LABEL_GHOSTTOWN_OFF 
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'GHSTON'  // Ghost Town ON
+0005: $ped_multiplier = 0.0                                                         // Set flag to have a 0x ped multiplier, thus empty streets
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_GHOSTTOWN_OFF
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'GHSTOFF'  // Ghost Town OFF
+0005: $ped_multiplier = 1.0                                                         // Set flag to have a 1x ped multipler, thus normal levels of activity
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE PLAYER VULNERABILITIES
+// ====================================================================================================================
+:LABEL_PLAYER_VULN
+00D6: if                                                                            /* [Note: The state of this flag will be applied to the game world on each iteration of the main loop] */
+0038:   $player_invulnerable == TRUE                                                /* [Note: Regardless of the state of this flag, basic player health/armour levels will ALWAYS be =250] */ 
+004D: jump_if_false @LABEL_PLAYER_VULN_ON 
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'VULN2'  // Vulnerable
+0004: $player_invulnerable = FALSE                                                  // Set flag to have Player as Invulnerable
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_PLAYER_VULN_ON
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'VULN1'  // Invulnerable
+0004: $player_invulnerable = TRUE                                                   // Set flag to have Player as Invulnerable
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): TOGGLE FROZEN TIME
+// ====================================================================================================================
+:LABEL_FREEZE_TIME
+00D6: if                                                                            /* [Note: When 'frozen', the locked time values will be applied to the game world on each iteration of the main loop] */
+0038:   $time_frozen == TRUE
+004D: jump_if_false @LABEL_FREEZE_TIME_FREEZE 
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'FRZOFF'  // Time Unfrozen
+0004: $time_frozen = FALSE                                                          // Set flag to have Time be unfrozen, and free to tick forward as normal
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_FREEZE_TIME_FREEZE
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'FRZON'  // Time Frozen
+0004: $time_frozen = TRUE                                                           // Set flag to have Time be frozen, storing the current hour/min value it will be locked at
+00BF: $time_frozen_hour = current_time_hours, $time_frozen_minute = current_time_minutes 
+00D6: if
+8038:   not $weather_type == -1                                                     /* [TIME/WEATHER SHENANIGANS FIX: time-frozen + weather-unfrozen = unpredictable game engine weather behaviour] */ 
+004D: jump_if_false @LABEL_WEATHER_CYCLE_FROZEN_WITH_TIME_SILENT                    /* [ SO: Ensure weather has a frozen value when time does (aka we never allow weather's -1 case in this scenario)] */
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): CHANGE WEATHER
+// ====================================================================================================================
+:LABEL_WEATHER
+00D6: if                                                                            /* [NOTE: Engine weather type values: 0-20 (can go much further, but these seem to be the 'normal' weather options] */
+0038:   $weather_type == 20                                                         /* [      This feature is used to lock the weather in at one of these levels, or return to the normal game weather] */ 
+004D: jump_if_false @LABEL_WEATHER_CYCLE_FROZEN                                     /* [       We use the value of -1 to indicate the latter scenario - of the game taking back normal weather control] */
+00D6: if                                                                            /* [NOTE: When not in -1 state, the locked weather type value will be applied to the game world on each iteration of the main loop] */
+0038:   $time_frozen == FALSE                                                       
+004D: jump_if_false @LABEL_WEATHER_CYCLE_FROZEN_WITH_TIME
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // IF weather currently set as 20   [the last frozen-weather value in sequence]
+03E5: show_text_box 'WEADEF'  // Weather Control Disabled                           // AND time is not currently frozen [RELATES TO THE TIME/WEATHER SHENANIGANS FIX]
+0004: $weather_type = -1                                                            //    - Reset sequence counter to -1
+01B7: release_weather                                                               //    - And tell the game to take-over weather again (aka behave normally)
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+:LABEL_WEATHER_CYCLE_FROZEN                                                         
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // IF weather currently set < 20 (including if it was the special -1 [aka not-frozen] value)
+03E5: show_text_box 'CHGWTH'  // Weather Changed                                    //    - Increment sequence counter to next frozen-weather type
+0008: $weather_type += 1                                                            //      (if had been at -1, now we are at 0, and thus back in frozen-weather modes)
+0001: wait 250 ms                                                                   //      (nb. dont need to activate this new weather state here, it'll happen on return to main loop)
+0002: jump @ULTSCM_LOOP                                                             
+
+:LABEL_WEATHER_CYCLE_FROZEN_WITH_TIME                                               
+018C: play_sound 1058 at 0.0 0.0 0.0                                                /* [TIME/WEATHER SHENANIGANS FIX: time-frozen + weather-unfrozen = unpredictable game engine weather behaviour] */
+03E5: show_text_box 'CHGWTH'  // Weather Changed                                    // IF time currently frozen and weather IS/WAS-ABOUT-TO-BE set to -1
+:LABEL_WEATHER_CYCLE_FROZEN_WITH_TIME_SILENT                                        //    - We cannot allow this, so instead 'skip/stop' the -1 state and set weather to be fixed at first in fixed-weather sequence 
+0004: $weather_type = 0
+0001: wait 250 ms
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): JETPACK
+// ====================================================================================================================
+:LABEL_JETPACK_ENABLE
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // Activate jetpack mode
+03E5: show_text_box 'JETON'  // Jetpack ON
+0004: $jetpack_on = TRUE
+04D7: set_actor $PLAYER_ACTOR locked TRUE 
+0001: wait 200 ms
+0002: jump @LABEL_JETPACK_STILL_ACTIVE
+
+:LABEL_JETPACK_DISABLE                                                              // Deactivate jetpack mode
+018C: play_sound 1058 at 0.0 0.0 0.0 
+03E5: show_text_box 'JETOFF'  // Jetpack OFF
+0050: gosub @FCN_SILENTLY_DISABLE_JETPACK                                           // - [NB. Via a function as we also use it to ensure an active jetpack automatically disabled if a foot-to-vehicle-teleport-load performed]  
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Process/Handle an active jetpack -------------------------------------------------------------------------------
+:LABEL_JETPACK_ACTIVE
+00D6: if and 
+80E1:   not player 0 pressed_key 13 // CAMERA                                       // Detect request to disable jetpack
+80E1:   not player 0 pressed_key 15 // ENTER VEHICLE                                //  [an intentional one (via normal toggle button), or implicitly (enter-vehicle button, as we dont want it on when in car)
+004D: jump_if_false @LABEL_JETPACK_DISABLE  
+:LABEL_JETPACK_STILL_ACTIVE                                                         // [Note we wont use our existing 8@-11@ vars (for Primary direction detection), as we want more sensitivity here]
+00E2: get_player $PLAYER_CHAR key 0 state_to 12@                                    // Get Primary   left-vs-right status       (for keyboards: assoc keys; for gamepads: left-joystick X-axis)
+00E2: get_player $PLAYER_CHAR key 1 state_to 13@                                    //               forward-vs-backward status (for keyboards: assoc keys; for gamepads: left-joystick Y-axis)
+00E2: get_player $PLAYER_CHAR key 2 state_to 14@                                    // Get Alternate left-vs-right status       (for keyboards: assoc keys; for gamepads: right-joystick X-axis)
+00E2: get_player $PLAYER_CHAR key 3 state_to 15@                                    //               forward-vs-backward status (for keyboards: assoc keys; for gamepads: right-joystick Y-axis)
+068D: get_camera_position_to 21@ 22@ 23@                                            // Handle 'turn player (thus move camera) by looking' while jetpacking [needed because SA, unlike VC, wont do it without proper foot-movement-turn animation, which isn't possible while jetpacking/player-locked]
+068E: get_camera_target_point_to 24@ 25@ 26@                                        //  (Get CamPosition and CamTarget coords)
+000F: 24@ -= 21@                                                                    //  (CamTargetX -= CamPositionX)
+000F: 25@ -= 22@                                                                    //  (CamTargetY -= CamPositionY)
+0604: get_Z_angle_for_point 24@ 25@ store_to 27@                                    //  (Calc zAngle assoc w/ player facing CamTargetX,CamTargetY)
+0173: set_actor $PLAYER_ACTOR Z_angle_to 27@
+0007: 4@ =  5.0                                                                     // Determine appropriate jetpack distance offset amount (store positive amount in 4@, negative amount in 5@)
+0007: 5@ = -5.0                                                                     //  [detects a keypress to indicate desire to use smaller offset (move slower)]
+00D6: if
+00E1:   player 0 pressed_key 16 // SPRINT
+004D: jump_if_false @LABEL_JETPACK_UP
+0007: 4@ =  1.0
+0007: 5@ = -1.0
+:LABEL_JETPACK_UP                                                                   // Detect/Perform jetpack movements...
+00D6: if                                                                            // -----------------------------------
+00E1:   player 0 pressed_key 14 // JUMP
+004D: jump_if_false @LABEL_JETPACK_FWD
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 0.0 4@      //  - Move upwards (Z axis increment)
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER  
+:LABEL_JETPACK_FWD                                                                  // -----------------------------------
+00D6: if  
+8019:   not 13@ > -70 // MOVE FORWARD (keyboard or gamepad)                                                                  // [Note: Low activation threshold (70, instead of 100-128), to better support 'diagonal movement']
+004D: jump_if_false @LABEL_JETPACK_RIGHT
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 4@ -1.0     //  - Move forward (Y axis increment)
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@ 
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER
+:LABEL_JETPACK_RIGHT                                                                // -----------------------------------
+00D6: if  
+0019:   12@ > 70      // MOVE RIGHT (keyboard or gamepad)                                                                    // [Note: Low activation threshold (70, instead of 100-128), to better support 'diagonal movement']
+004D: jump_if_false @LABEL_JETPACK_DOWN
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 4@ 0.0 -1.0     //  - Move right (X axis increment)         [Note: Will be a bit awkward if happen to be set to use 'Classic Controls' in the game settings] 
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER
+:LABEL_JETPACK_DOWN                                                                 // -----------------------------------
+00D6: if  
+00E1:   player 0 pressed_key 18 // CROUCH
+004D: jump_if_false @LABEL_JETPACK_BWD 
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 0.0 5@      //  - Move downward (Z axis decrement)
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER 
+:LABEL_JETPACK_BWD                                                                  // -----------------------------------
+00D6: if  
+0019:   13@ > 70      // MOVE BACKWARD (keyboard or gamepad)                                                                 // [Note: Low activation threshold (70, instead of 100-128), to better support 'diagonal movement']
+004D: jump_if_false @LABEL_JETPACK_LEFT
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 5@ -1.0     //  - Move backward (Y axis decrement)      [Note: Will be a bit awkward if happen to be set to use 'Classic Controls' in the game settings]
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER
+:LABEL_JETPACK_LEFT                                                                 // -----------------------------------
+00D6: if  
+8019:   not 12@ > -70 // MOVE LEFT (keyboard or gamepad)                                                                     // [Note: Low activation threshold (70, instead of 100-128), to better support 'diagonal movement']
+004D: jump_if_false @LABEL_JETPACK_ROTATE_RIGHT
+04C4: store_coords_to 1@ 2@ 3@ from_actor $PLAYER_ACTOR with_offset 5@ 0.0 -1.0     //  - Move left (X axis decrement)          [Note: Will be a bit awkward if happen to be set to use 'Classic Controls' in the game settings]
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0050: gosub @FCN_JETPACK_GAMEPAD_CAMERA_FIXER
+:LABEL_JETPACK_ROTATE_RIGHT                                                         // -----------------------------------
+/*
+00D6: if
+0019:   14@ > 100     // TURN RIGHT (keyboard or gamepad)
+004D: jump_if_false @LABEL_JETPACK_ROTATE_LEFT
+0172: 0@ = actor $PLAYER_ACTOR z_angle
+000B: 0@ += 355.0                                                                   //  - Rotate player angle slightly to right [Note: DONT NEED THIS, at least not if gonna be triggered via normal move-camera/look-left behaviour]
+0173: set_actor $PLAYER_ACTOR z_angle_to 0@                                         //                                          [       As our fix above takes care of that for us (regardless of input method, controller settings)]
+0373: set_camera_directly_behind_player                                             //                                          [      ONLY KEEPING for variants that want this mapped to a different trigger (Legacy variant triggers it via move-player-left)]
+*/
+:LABEL_JETPACK_ROTATE_LEFT                                                          // -----------------------------------
+/*
+00D6: if
+8019:   not 14@ > -100 // TURN LEFT (keyboard or gamepad)
+004D: jump_if_false @ULTSCM_LOOP
+0172: 0@ = actor $PLAYER_ACTOR z_angle
+000B: 0@ += 5.0                                                                     //  - Rotate player angle slightly to left  [Note: DONT NEED THIS, at least not if gonna be triggered via normal move-camera/look-left behaviour]
+0173: set_actor $PLAYER_ACTOR z_angle_to 0@                                         //                                          [       As our fix above takes care of that for us (regardless of input method, controller settings)]
+0373: set_camera_directly_behind_player                                             //                                          [      ONLY KEEPING for variants that want this mapped to a different trigger (Legacy variant triggers it via move-player-left)]
+*/
+0002: jump @ULTSCM_LOOP                                                             // -----------------------------------
+
+// --- Related Utility Function: Silently Disables the Jetpack --------------------------------------------------------
+// [CONTEXT] Usually called when jetpack was active, but for simplicity in other times may just make the call regardless (as no harm if happens to already be off)
+:FCN_SILENTLY_DISABLE_JETPACK  
+0004: $jetpack_on = FALSE
+04D7: set_actor $PLAYER_ACTOR locked FALSE
+0051: return
+
+// --- Related Utility Function: Ensures/Reinstates player-lock if Jetpack is enabled ---------------------------------
+// [CONTEXT] Can be called after an event where we want to continue any existing Jetpack but the player may have been unfrozen, thus need to potentially redo the player-lock aspect 
+:FCN_ENSURE_ANY_ENABLED_JETPACK_DOING_PLAYERLOCK
+00D6: if  
+0038:   $jetpack_on == TRUE
+004D: jump_if_false @LABEL_NEVERMIND_JETPACK_WAS_OFF
+04D7: set_actor $PLAYER_ACTOR locked TRUE
+:LABEL_NEVERMIND_JETPACK_WAS_OFF
+0051: return
+
+// --- Related Utility Function: Fixes wonky movement/camera behaviour for jetpack movements w/ gamepad (aka classic-style controls) -------
+// [CONTEXT] Called after those specific jetpack movements (will test for the associated controller setup scenario before doing anything)
+// [NOTE] The wonky behaviour (without this fix) makes strafing also awkwardly turn the player as well; camera can go funny for backwards and strafing; forward+slow movement can stuffer
+:FCN_JETPACK_GAMEPAD_CAMERA_FIXER
+00D6: if
+0A4B:   controls_set_to_joystick                                                    // We test for gamepad aka classic-style controls, and only do our fix in that case
+004D: jump_if_false @LABEL_NEVERMIND_NOT_GAMEPAD                                    //  Because it has the drawback of removing the ability to adjust the camera along the 
+0373: set_camera_directly_behind_player                                             //   Y-axis while moving the jetpack in the directions that trigger this code
+:LABEL_NEVERMIND_NOT_GAMEPAD                                                        // [drawback worth it for gampeoad users, because the behaviour w/out this is worse] 
+0051: return
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): SET WANTED LEVEL UP + SET WANTED LEVEL DOWN
+// ====================================================================================================================
+:LABEL_WANTED_LEVEL_UP                                                              // Raise wanted level (0->6 stars)
+018C: play_sound 1058 at 0.0 0.0 0.0 
+01C0: 0@ = player $PLAYER_CHAR wanted_level                                         //  - Fetch current wanted level (will always return 0-6 value) 
+000A: 0@ += 1                                                                       //  - Add 1 for desired new wanted level (may end up as 7, but okay, game will treat as 6)
+0002: jump @LABEL_WANTED_LEVEL_SET_SOMETHING                                        //  - Then call to apply the new wanted level
+
+:LABEL_WANTED_LEVEL_DOWN                                                            // Lower wanted level (6->0 stars)
+018C: play_sound 1058 at 0.0 0.0 0.0 
+01C0: 0@ = player $PLAYER_CHAR wanted_level                                         //  - Fetch current wanted level (will always return 0-6 value)
+000E: 0@ -= 1                                                                       //  - Dec 1 for desired new wanted level (may end up as -1, but okay, game will treat as 0)
+00D6: if                                                                            //  - Then make appropriate call to apply the new wanted level
+0019:   0@ > 0
+004D: jump_if_false @LABEL_WANTED_LEVEL_SET_NOTHING
+0002: jump @LABEL_WANTED_LEVEL_SET_SOMETHING
+
+:LABEL_WANTED_LEVEL_SET_NOTHING                                                     // Apply a 0-star wanted level
+03E5: show_text_box 'WNTOFF'  // Wanted Level Cleared (Player Ignored)
+0004: $player_ignored = TRUE                                                        //  - If gonna be 0 stars, flag as player to BE ignored
+0004: $max_wanted_level = 0                                                         //     and that their wanted level cannot naturally increase
+010D: set_player $PLAYER_CHAR wanted_level_to 0@                                    //  - Set new wanted level to the desired value (-1 treated as a request for 0)
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_WANTED_LEVEL_SET_SOMETHING                                                   // Apply a 1-6 star wanted level
+03E5: show_text_box 'WNTSET'  // Wanted Level Set
+0004: $player_ignored = FALSE                                                       //  - If gonna be 1-6 stars, flag as player to NOT be ignored
+0004: $max_wanted_level = 6                                                         //     and that their wanted level can naturally increase up to 6
+01F0: set_max_wanted_level_to $max_wanted_level                                     //  - Immediately update max wanted level (so the subsequent 'set' line below will definitely be accepted)
+010D: set_player $PLAYER_CHAR wanted_level_to 0@                                    //  - Set new wanted level to the desired value (7 treated as a request for 6)
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (FOOT/VEHICLE): TELEPORTATION
+// ====================================================================================================================
+// --- PART 1. Saving Teleport Locations ------------------------------------------------------------------------------
+:LABEL_SAVE_TELEPORT_LOCATION1_FOOT                                                 // SAVE Teleport Location 1 (Foot Version)
+03E5: show_text_box 'SAVETP1'  // Location 1 Saved
+018C: play_sound 1058 at 0.0 0.0 0.0 
+0004: $teleport1_exists = TRUE
+04C4: store_coords_to $teleport1_X $teleport1_Y $teleport1_Z from_actor $PLAYER_ACTOR with_offset 0.0 0.0 0.0 
+0172: $teleport1_A = actor $PLAYER_ACTOR Z_angle 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SAVE_TELEPORT_LOCATION2_FOOT                                                 // SAVE Teleport Location 2 (Foot Version)
+03E5: show_text_box 'SAVETP2'  // Location 2 Saved
+018C: play_sound 1058 at 0.0 0.0 0.0 
+0004: $teleport2_exists = TRUE
+04C4: store_coords_to $teleport2_X $teleport2_Y $teleport2_Z from_actor $PLAYER_ACTOR with_offset 0.0 0.0 0.0 
+0172: $teleport2_A = actor $PLAYER_ACTOR Z_angle 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SAVE_TELEPORT_LOCATION1_CAR                                                  // SAVE Teleport Location 1 (Car Version)
+03E5: show_text_box 'SAVETP1'  // Location 1 Saved
+018C: play_sound 1058 at 0.0 0.0 0.0 
+0004: $teleport1_exists = TRUE
+00AA: store_car $current_car position_to $teleport1_X $teleport1_Y $teleport1_Z
+0174: $teleport1_A = car $current_car Z_angle 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SAVE_TELEPORT_LOCATION2_CAR                                                  // SAVE Teleport Location 2 (Car Version)
+03E5: show_text_box 'SAVETP2'  // Location 2 Saved
+018C: play_sound 1058 at 0.0 0.0 0.0 
+0004: $teleport2_exists = TRUE
+00AA: store_car $current_car position_to $teleport2_X $teleport2_Y $teleport2_Z
+0174: $teleport2_A = car $current_car Z_angle 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- PART 2. Loading Teleport Locations -----------------------------------------------------------------------------
+:LABEL_LOAD_TELEPORT_LOCATION1_FOOT                                            // LOAD Teleport Location 1 (Foot Version) [MUST have already confirmed $teleport1_exists is TRUE, and be on-foot]
+03E5: show_text_box 'LOADTP1'  // Location 1 Loaded
+0089: 0@ = $teleport1_A                                                             //  - Stores Location 1 coordinates/angle into local vars 0@-4@
+0089: 1@ = $teleport1_X
+0089: 2@ = $teleport1_Y
+0089: 3@ = $teleport1_Z
+0002: jump @LABEL_DECIDE_TELEPORT_LOAD_FOOT_APPROACH                                //  - Make the call to decide which type of FOOT load to perform, then do it
+
+:LABEL_LOAD_TELEPORT_LOCATION2_FOOT                                            // LOAD Teleport Location 2 (Foot Version) [MUST have already confirmed $teleport2_exists is TRUE, and be on-foot]
+03E5: show_text_box 'LOADTP2'  // Location 2 Loaded
+0089: 0@ = $teleport2_A                                                             //  - Stores Location 2 coordinates/angle into local vars 0@-4@
+0089: 1@ = $teleport2_X
+0089: 2@ = $teleport2_Y
+0089: 3@ = $teleport2_Z
+0002: jump @LABEL_DECIDE_TELEPORT_LOAD_FOOT_APPROACH                                //  - Make the call to decide which type of FOOT load to perform, then do it
+
+:LABEL_LOAD_TELEPORT_LOCATION1_CAR                                             // LOAD Teleport Location 1 (Car Version) [MUST have already confirmed $teleport1_exists is TRUE, and be in-vehicle]
+03E5: show_text_box 'LOADTP1'  // Location 1 Loaded
+0089: 0@ = $teleport1_A                                                             //  - Stores Location 1 coordinates/angle into local vars 0@-4@
+0089: 1@ = $teleport1_X
+0089: 2@ = $teleport1_Y
+0089: 3@ = $teleport1_Z
+0002: jump @LABEL_PERFORM_TELEPORT_LOAD_CAR                                         //  - Make the call to execute a plain IN CAR load
+
+:LABEL_LOAD_TELEPORT_LOCATION2_CAR                                             // LOAD Teleport Location 2 (Car Version) [MUST have already confirmed $teleport2_exists is TRUE, and be in-vehicle]
+03E5: show_text_box 'LOADTP2'  // Location 2 Loaded
+0089: 0@ = $teleport2_A                                                             //  - Stores Location 2 coordinates/angle into local vars 0@-4@
+0089: 1@ = $teleport2_X
+0089: 2@ = $teleport2_Y
+0089: 3@ = $teleport2_Z
+0002: jump @LABEL_PERFORM_TELEPORT_LOAD_CAR                                         //  - Make the call to execute a plain IN CAR load
+
+// --- PART 2b. Low-level Perform-Teleport-Load -----------------------------------------------------------------------
+:LABEL_DECIDE_TELEPORT_LOAD_FOOT_APPROACH
+0050: gosub @FCN_GET_DESIRED_USABLE_PRIOR_VEHICLE_HOOK_TO_LOCAL                     //  - Gets hook of desired 'prior' vehicle (last/current vs 2nd-last), IF exist and still appropriate for use, puts it in 4@
+00D6: if
+8039:   not 4@ == FALSE
+004D: jump_if_false @LABEL_PERFORM_TELEPORT_LOAD_FOOT                               //  - If prior vehicle  unavailable for use, make the call to execute a plain ON FOOT load
+0002: jump @LABEL_PERFORM_TELEPORT_LOAD_FOOT2CAR                                    //  - If prior vehicle is available for use, make the call to execute a special FOOT-TO-CAR load
+
+:LABEL_PERFORM_TELEPORT_LOAD_FOOT                                                   // Perform a prepared Teleport Location LOAD: ON-FOOT, TO REMAIN ON-FOOT
+018C: play_sound 1058 at 0.0 0.0 0.0                                                //  [MUST have angle set in 0@, coords in 1@-3@]
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@
+0173: set_actor $PLAYER_ACTOR Z_angle_to 0@
+0373: set_camera_directly_behind_player
+0050: gosub @FCN_MAYBE_TPLOAD_REPLAY_CUT
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_PERFORM_TELEPORT_LOAD_FOOT2CAR                                               // Perform a prepared Teleport Location LOAD: ON-FOOT, TO BE PUT IN A CAR
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // [MUST have angle set in 0@, coords in 1@-3@, desired vehicle hook in 4@]
+0050: gosub @FCN_SILENTLY_DISABLE_JETPACK                                           //  - Ensure if currently Jetpacking that we disable it (because we are about to put them in a vehicle)
+01B4: set_player $PLAYER_CHAR can_move FALSE                                        //  - (Line 1 of 2, For 'Replay Cutting')
+0519: set_car 4@ locked TRUE                                                        //  - (Line 1 of 3, For 'Prevent Rare Momentum Carryover')
+02C2: car 4@ drive_to 1@ 2@ 3@                                                      //  - Used To "Wake Up" Car (Needed To Prevent Handling Bug)
+0001: wait 10 ms                                                                    //  - Give A Tiny Wait (Also Needed To Prevent Handling Bug) (Also also acts as Line 2 of 3 for 'Prevent Rare Momentum Carryover')
+036A: put_actor $PLAYER_ACTOR in_car 4@                                             //  - Put Player In Car (Need This And Next Two Lines In This Order To Prevent Handling Bug)
+0050: gosub @FCN_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE                                 //  - Possibly snap angle to north (if toggle enabled, vehicle is bike, and angle is close to north)
+00AB: put_car 4@ at 1@ 2@ 3@                                                        //  - Put Car At Coords
+0175: set_car 4@ z_angle_to 0@                                                      //  - Put Car At Angle
+0519: set_car 4@ locked FALSE                                                       //  - (Line 3 of 3, for 'Prevent Rare Momentum Carryover') [also important that there was a brief wait between this pair of lines]
+02EB: restore_camera_with_jumpcut                                                   //  - Reset Camera
+0373: set_camera_directly_behind_player 
+01B4: set_player $PLAYER_CHAR can_move TRUE                                         //  - (Line 2 of 2, For 'Replay Cutting' Code)
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+:LABEL_PERFORM_TELEPORT_LOAD_CAR                                                    // Perform a prepared Teleport Location LOAD: IN-CAR, TO REMAIN IN-CAR
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // [MUST have angle set in 0@, coords in 1@-3@]
+0519: set_car $current_car locked TRUE                                              //  - (Line 1 of 3, For 'Prevent Rare Momentum Carryover') [good test case: TP while in taxi sliding on ground on its roof]
+0001: wait 5 ms                                                                     //  - (Line 2 of 3, For 'Prevent Rare Momentum Carryover')
+00D6: if                                                                            // [Seems silly to do this here, as we've already decided we are in a vehicle so ofcourse we wanna do this type of load]
+00DF:   actor $PLAYER_ACTOR driving                                                 // [BUT: if teleport is triggered at almost-the-exact-moment you are about to crash off your (eg) bike, it could end up]
+004D: jump_if_false @LABEL_DECIDE_TELEPORT_LOAD_FOOT_APPROACH                       // [      here yet by the time the teleport is done you'll be off it, so it only moves you and now you're off your bike]
+0050: gosub @FCN_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE                                 //  - Possibly snap angle to north (if toggle enabled, vehicle is bike, and angle is close to north)
+00A1: put_actor $PLAYER_ACTOR at 1@ 2@ 3@ 
+0175: set_car $current_car z_angle_to 0@
+0519: set_car $current_car locked FALSE                                             //  - (Line 3 of 3, For 'Prevent Rare Momentum Carryover')
+02EB: restore_camera_with_jumpcut 
+0373: set_camera_directly_behind_player
+0050: gosub @FCN_MAYBE_TPLOAD_REPLAY_CUT 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP 
+
+// --- Related Utility Function: Potentially snaps Teleport Load Angle to 0 (North) -----------------------------------
+// [CONTEXT] Should be called during low-level Teleport Load functions (and thus 0@ is storing the angle to be loaded)
+//           Just needs to be called before the 0175 (set angle) opcode gets run [in foot2car version, do AFTER player gets put in vehicle] 
+:FCN_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE
+00D6: if and  
+0038:   $bike_teleport_north_magnet == TRUE
+047A:   actor $PLAYER_ACTOR driving_bike
+004D: jump_if_false @LABEL_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE_DONE_OR_SKIPPED
+00D6: if or
+0021:   0@   > 345.0
+0023:   15.0 > 0@
+004D: jump_if_false @LABEL_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE_DONE_OR_SKIPPED
+0007: 0@ = 0.0
+:LABEL_BIKE_TELEPORT_LOAD_NORTH_MAGNETISE_DONE_OR_SKIPPED 
+0051: return
+
+// --- Related Utility Function: Potentially triggers replay-cut on Teleport Load -------------------------------------
+// [CONTEXT] Called from FOOT and CAR Teleport Loads, upon completion of the teleporting process
+//           NOT called from the FOOT2CAR Teleport Load, which ALWAYS DOES THIS, REGARDLESS of the setting
+// [NOTE]    The replay-cut will be triggered depending on the status of the corresponding toggle
+:FCN_MAYBE_TPLOAD_REPLAY_CUT
+00D6: if  
+0038:   $always_teleport_cut_replay == TRUE
+004D: jump_if_false @LABEL_MAYBE_TPLOAD_REPLAY_CUT_DONE
+01B4: set_player $PLAYER_CHAR can_move FALSE
+0001: wait 2 ms
+01B4: set_player $PLAYER_CHAR can_move TRUE
+:LABEL_MAYBE_TPLOAD_REPLAY_CUT_DONE
+0051: return
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): ACTIVATE SAVE GAME PROMPT
+// ====================================================================================================================
+:LABEL_SAVE_GAME
+00D6: if or 
+0038:   $ONMISSION == TRUE                                                          // Player must not be 'on mission'  [standard game requirement for saving]
+8256:   not player $PLAYER_CHAR defined                                             // Player must be playing/available [standard game requirement for saving] [should be redundant for us, only here for safety/clarity] 
+00DF:   actor $PLAYER_ACTOR driving                                                 // Player must be on-foot           [standard game requirement for saving] [should be redundant for us, only here for safety/clarity]
+004D: jump_if_false @LABEL_SAVE_GAME_ALLOWED
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+:LABEL_SAVE_GAME_ALLOWED
+018C: play_sound 1058 at 0.0 0.0 0.0                                                // Pre-save behaviour:
+0004: $ONMISSION = TRUE                                                             //  - Enable 'on mission' flag [standard game behaviour for pre-save]
+01B4: set_player $PLAYER_CHAR can_move FALSE                                        //  - Disable player control   [standard game behaviour for pre-save]
+0172: 0@ = actor $PLAYER_ACTOR z_angle                                              //  - Save player angle        [because it will get lost/reset (to North) after save otherwise]
+03D8: show_save_screen                                                              
+:LABEL_SAVE_GAME_PENDING                                                            // Active the savegame screen/process, and wait...
+0001: wait 5 ms
+00D6: if and
+03D9:   save_done
+0256:   player $PLAYER_CHAR defined 
+004D: jump_if_false @LABEL_SAVE_GAME_PENDING                                        // Once finished, perform Post-save behaviour:
+0173: set_actor $PLAYER_ACTOR Z_angle_to 0@                                         //  - Restore the player angle from our stored copy from before save 
+02EB: restore_camera_with_jumpcut                                                   //  - Update/Refresh camera     [standard game behaviour for post-save]
+0373: set_camera_directly_behind_player                                             //  - Update/Refresh camera     [standard game behaviour for post-save]
+01B4: set_player $PLAYER_CHAR can_move TRUE                                         //  - Enable player control     [standard game behaviour for post-save]
+0004: $ONMISSION = FALSE                                                            //  - Disable 'on mission' flag [standard game behaviour for post-save]
+0050: gosub @FCN_DO_UNITED_QUICK_LOAD_HELPER_IF_NESC
+0050: gosub @FCN_ENSURE_ANY_ENABLED_JETPACK_DOING_PLAYERLOCK                        // If Jetpack had been enabled, it still will be, but the 'player locked' part of it will need re-applying, so do that 
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): VEHICLE SPAWNERS
+// ====================================================================================================================
+/* [NOTE: These features are made to spawn a set of vehicles surrounding the player's current position] */
+/* [NOTE: Offsets + spawn order may need to differ per spawner/vehicle (not just due to vehicle size/shape, also engine oddities)] */
+/* [      So ALWAYS test each set (covering, at minimum, the 4 cases of being triggered by a player facing North,South,East,West)] */
+/* [      And once a set seems to be always working, consider leaving it well alone! Unless want to go back and test it all again] */ 
+
+// --- Vehicle Spawner Set 1a -----------------------------------------------------------------------------------------
+:LABEL_SPAWNER1 
+00D6: if 
+0038:   $jetpack_on == FALSE 
+004D: jump_if_false @LABEL_JETPACK_SPAWNER1                                         // [Hop over to Jetpack variant if appropriate]
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #TAXI                                                                    // Spawn #TAXI at left
+0007: 1@ = -4.0                                                                     
+0007: 2@ =  1.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #NRG500                                                                  // Spawn #NRG500 at front
+0007: 1@ = 0.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #CABBIE                                                                  // Spawn #CABBIE at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #FREEWAY                                                                 // Spawn #FREEWAY at front-left
+0007: 1@ = -4.0
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #PACKER                                                                  // Spawn #PACKER back
+0007: 1@ =   0.0
+0007: 2@ = -12.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SANCHEZ                                                                 // Spawn #SANCHEZ at front-right
+0007: 1@ = 4.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #TURISMO                                                                 // Spawn #TURISMO at back-right
+0007: 1@ =   7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #INFERNUS                                                                // Spawn #INFERNUS at back-left
+0007: 1@ =  -9.0
+0007: 2@ = -11.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 2a -----------------------------------------------------------------------------------------
+:LABEL_SPAWNER2
+00D6: if 
+0038:   $jetpack_on == FALSE 
+004D: jump_if_false @LABEL_JETPACK_SPAWNER2                                         // [Hop over to Jetpack variant if appropriate]
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #COACH                                                                   // Spawn #COACH at back
+0007: 1@ =   0.0
+0007: 2@ = -12.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #MONSTERA                                                                // Spawn #MONSTERA at left
+0007: 1@ = -6.0                                                                     
+0007: 2@ =  0.5
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #PCJ600                                                                  // Spawn #PCJ600 at front2
+0007: 1@ = -3.75
+0007: 2@ = 9.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #CADDY                                                                   // Spawn #CADDY at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BIKE                                                                    // Spawn Bonus #BIKE at front7
+0007: 1@ = 5.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER 
+0006: 0@ = #PIZZABOY                                                                // Spawn #PIZZABOY at front1
+0007: 1@ = -5.5
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #DFT30                                                                   // Spawn #DFT30 at back-left
+0007: 1@ =  -8.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BMX                                                                     // Spawn #BMX at front5
+0007: 1@ = 1.5
+0007: 2@ = 10.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #RHINO                                                                   // Spawn #RHINO at back-right
+0007: 1@ =   8.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0006: 0@ = #COPBIKE                                                                 // Spawn Bonus #COPBIKE at front4
+0007: 1@ = 0.0
+0007: 2@ = 11.5 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #MTBIKE                                                                  // Spawn Bonus #MTBIKE at front6
+0007: 1@ = 3.25
+0007: 2@ = 9.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0006: 0@ = #FCR900                                                                  // Spawn Bonus #FCR900 at front3
+0007: 1@ = -2.0
+0007: 2@ = 10.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                 
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 3a -----------------------------------------------------------------------------------------
+:LABEL_SPAWNER3
+00D6: if 
+0038:   $jetpack_on == FALSE 
+004D: jump_if_false @LABEL_JETPACK_SPAWNER3                                         // [Hop over to Jetpack variant if appropriate]
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #HOTRING                                                                 // Spawn #HOTRING at left
+0007: 1@ = -4.0                                                                     
+0007: 2@ =  0.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #PHOENIX                                                                 // Spawn #PHOENIX at back
+0007: 1@ =   0.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #COMET                                                                   // Spawn #COMET at front
+0007: 1@ = 0.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BUFFALO                                                                 // Spawn #BUFFALO at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #CHEETAH                                                                 // Spawn #CHEETAH at front-left
+0007: 1@ = -5.0
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SULTAN                                                                  // Spawn #SULTAN at back-left
+0007: 1@ =  -7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BULLET                                                                  // Spawn #BULLET at front-right
+0007: 1@ = 5.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BANSHEE                                                                 // Spawn #BANSHEE at back-right
+0007: 1@ =   7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 4a -----------------------------------------------------------------------------------------
+:LABEL_SPAWNER4
+00D6: if 
+0038:   $jetpack_on == FALSE 
+004D: jump_if_false @LABEL_JETPACK_SPAWNER4                                         // [Hop over to Jetpack variant if appropriate]
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #BROADWAY                                                                // Spawn #BROADWAY at left
+0007: 1@ = -4.0                                                                     
+0007: 2@ =  0.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #DUMPER                                                                  // Spawn #DUMPER at back
+0007: 1@ =   0.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #MESA                                                                    // Spawn #MESA at front-centerR
+0007: 1@ = 1.5
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #VOODOO                                                                  // Spawn #VOODOO at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #BFINJECT                                                                // Spawn #BFINJECT at front-left
+0007: 1@ = -6.0
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #WALTON                                                                  // Spawn #WALTON at back-left
+0007: 1@ =  -7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SANDKING                                                                // Spawn #SANDKING at front-right
+0007: 1@ = 6.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SLAMVAN                                                                 // Spawn #SLAMVAN at back-right
+0007: 1@ =   7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0006: 0@ = #QUAD                                                                    // Spawn Bonus #QUAD at half-front
+0007: 1@ = 0.0
+0007: 2@ = 2.5 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0006: 0@ = #BANDITO                                                                 // Spawn Bonus #BANDITO at front-centerL
+0007: 1@ = -2.2
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 1b (while-jetpacking variant) --------------------------------------------------------------
+:LABEL_JETPACK_SPAWNER1
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #COASTG                                                                  // Spawn #COASTG at left
+0007: 1@ = -8.5                                                                     
+0007: 2@ =  0.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #REEFER                                                                  // Spawn #REEFER at back
+0007: 1@ =   0.0
+0007: 2@ = -14.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SQUALO                                                                  // Spawn #SQUALO at front
+0007: 1@ =  0.0
+0007: 2@ = 14.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #DINGHY                                                                  // Spawn #DINGHY at right
+0007: 1@ = 8.5
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SPEEDER                                                                 // Spawn #SPEEDER at front-left
+0007: 1@ = -13.0
+0007: 2@ =  18.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #PREDATOR                                                                // Spawn #PREDATOR at back-left
+0007: 1@ = -13.0
+0007: 2@ = -18.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #JETMAX                                                                  // Spawn #JETMAX at front-right
+0007: 1@ = 13.0
+0007: 2@ = 18.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #TROPIC                                                                  // Spawn #TROPIC at back-right
+0007: 1@ =  13.0
+0007: 2@ = -20.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0006: 0@ = #VORTEX                                                                  // Spawn Bonus #VORTEX at half-front
+0007: 1@ =  0.0
+0007: 2@ =  2.5 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 2b (while-jetpacking variant) --------------------------------------------------------------
+:LABEL_JETPACK_SPAWNER2
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #POLMAV                                                                  // Spawn #POLMAV at left
+0007: 1@ = -8.5                                                                     
+0007: 2@ = -1.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SHAMAL                                                                  // Spawn #SHAMAL at back
+0007: 1@ =   0.0
+0007: 2@ = -24.5
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #HYDRA                                                                   // Spawn #HYDRA at front
+0007: 1@ =  0.0
+0007: 2@ = 13.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #HUNTER                                                                  // Spawn #HUNTER at right
+0007: 1@ = 8.5
+0007: 2@ = -1.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #SKIMMER                                                                 // Spawn #SKIMMER at front-left
+0007: 1@ = -11.0
+0007: 2@ =  11.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #MAVERICK                                                                // Spawn #MAVERICK at back-left
+0007: 1@ = -13.0
+0007: 2@ = -18.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #STUNT                                                                   // Spawn #STUNT at front-right
+0007: 1@ = 11.0
+0007: 2@ = 11.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #VCNMAV                                                                  // Spawn #VCNMAV at back-right
+0007: 1@ =  13.0
+0007: 2@ = -18.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 3b -----------------------------------------------------------------------------------------
+:LABEL_JETPACK_SPAWNER3
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #TOWTRUCK                                                                // Spawn #TOWTRUCK at left
+0007: 1@ = -4.0                                                                     
+0007: 2@ =  0.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #ENFORCER                                                                // Spawn #ENFORCER at back
+0007: 1@ =   0.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #COPCARLA                                                                // Spawn #COPCARLA at front
+0007: 1@ = 0.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #DOZER                                                                   // Spawn #DOZER at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #PATRIOT                                                                 // Spawn #PATRIOT at front-left
+0007: 1@ = -5.5
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #FIRETRUK                                                                // Spawn #FIRETRUK at back-left
+0007: 1@ =  -7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #FBIRANCH                                                                // Spawn #FBIRANCH at front-right
+0007: 1@ = 5.5
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #AMBULAN                                                                 // Spawn #AMBULAN at back-right
+0007: 1@ =   7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Vehicle Spawner Set 4b -----------------------------------------------------------------------------------------
+:LABEL_JETPACK_SPAWNER4
+018C: play_sound 1058 at 0.0 0.0 0.0
+0006: 0@ = #BURRITO                                                                 // Spawn #BURRITO at left
+0007: 1@ = -4.0                                                                     
+0007: 2@ =  0.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #LINERUN                                                                 // Spawn #LINERUN at back
+0007: 1@ =   1.0
+0007: 2@ = -13.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #STRETCH                                                                 // Spawn #STRETCH at front
+0007: 1@ = 0.0
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #MRWHOOP                                                                 // Spawn #MRWHOOP at right
+0007: 1@ = 4.0
+0007: 2@ = 0.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #ROMERO                                                                  // Spawn #ROMERO at front-left
+0007: 1@ = -5.5
+0007: 2@ =  8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #TRASH                                                                   // Spawn #TRASH at back-left
+0007: 1@ =  -7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #FORKLIFT                                                                // Spawn #FORKLIFT at front-right
+0007: 1@ = 5.5
+0007: 2@ = 8.0 
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER                                           
+0006: 0@ = #HOTKNIFE                                                                // Spawn #HOTKNIFE at back-right
+0007: 1@ =   7.0
+0007: 2@ = -10.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// --- Related Utility Function: Spawn single vehicle at player offset ------------------------------------------------
+// [REQUIREMENTS] Have desired vehicle model in 0@, x-offset in 1@, y-offset in 2@
+:FCN_SPAWN_VEHICLE_SET_MEMBER
+0247: load_model 0@
+038B: load_requested_models
+04C4: store_coords_to 4@ 5@ 6@ from_actor $PLAYER_ACTOR with_offset 1@ 2@ 0.0       // Get coordinates of this x/y offset of player position
+0172: 7@ = actor $PLAYER_ACTOR z_angle                                              // Get angle of player
+00A5: 3@ = create_car 0@ at 4@ 5@ 6@                                                // Spawn the vehicle at this position/angle
+0175: set_car 3@ z_angle_to 7@
+020A: set_car 3@ door_status_to 1                                                   //  - Ensuring car doors not locked (to avoid issue on vehicles where they might have been by default)
+01C3: remove_references_to_car 3@ 
+0249: release_model 0@
+0051: return
+
+// ====================================================================================================================
+// FEATURE (ON FOOT): RANDOM VEHICLE SPAWNER
+// ====================================================================================================================
+:LABEL_RANDOM_SPAWNER
+018C: play_sound 1058 at 0.0 0.0 0.0
+0209: 0@ = random_int_in_ranges 400 612                                             // Generates random int between 400-611 inclusive
+00D6: if and                                                                        // Confirm its not one of the potentially-problematic/useless vehicles in that range
+8039:  not 0@ == 441 // rcbandit                                                       //  [If so, we'll just spawn an nrg instead]
+8039:  not 0@ == 464 // rcbaron
+8039:  not 0@ == 465 // rcraider
+8039:  not 0@ == 501 // rcgoblin
+8039:  not 0@ == 564 // rctiger
+8039:  not 0@ == 594 // rccam
+004D: jump_if_false @LABEL_RAND_CAR_ID_DUDFIX
+00D6: if and 
+8039:  not 0@ == 449 // tram
+8039:  not 0@ == 537 // freight  (train car)
+8039:  not 0@ == 538 // streak   (train car)
+8039:  not 0@ == 569 // freiflat (train tray)
+8039:  not 0@ == 570 // streakc  (train car)
+8039:  not 0@ == 590 // freibox  (train car)
+004D: jump_if_false @LABEL_RAND_CAR_ID_DUDFIX
+00D6: if and
+8039:  not 0@ == 592 // androm
+8039:  not 0@ == 606 // bagboxa  (trailer thing)
+8039:  not 0@ == 607 // bagboxb  (trailer thing)
+8039:  not 0@ == 608 // tugstair (stairs)
+8039:  not 0@ == 610 // farmtr1  (trailer thing)
+8039:  not 0@ == 611 // utiltr1  (trailer thing)
+004D: jump_if_false @LABEL_RAND_CAR_ID_DUDFIX
+0002: jump @LABEL_RAND_CAR_ID_OKAY
+:LABEL_RAND_CAR_ID_DUDFIX
+0004: 0@ = 522    // nrg500
+:LABEL_RAND_CAR_ID_OKAY
+0007: 1@ =  0.0                                                                     // Spawn this random vehicle in front of the player
+0007: 2@ = 14.0
+0050: gosub @FCN_SPAWN_VEHICLE_SET_MEMBER
+0001: wait 250 ms 
+0002: jump @ULTSCM_LOOP
+
+// ====================================================================================================================
+// Junk code, debugging, etc
+// ====================================================================================================================
+
+:FCN_DO_UNITED_QUICK_LOAD_HELPER_IF_NESC                                            // A function present/used only when wanting to use this code in a 'GTA United' SCM
+00D6: if                                                                            // Called on game-start and game-restart (aka loading from a save)
+0038:   $for_quick_load_united_scm == TRUE                                          //  [Well, only called from load-a-save when the save was made via the USCM feature, not via normal game way]
+004D: jump_if_false @LABEL_UNITED_QUICK_LOAD_HELPER_END
+04E4: refresh_game_renderer_at 2017.35 -2286.6                                      // Not entirely sure, but these 3 lines seem to help
+03CB: set_rendering_origin_at 2017.35 -2286.6 4.0                                   //  [note that this approach is based off of the VC USCM having to do similar in its SAiVC USCM]
+038B: load_requested_models
+:LABEL_UNITED_QUICK_LOAD_HELPER_END
+0051: return
+
+/*
+Debugging Help:   (misc opcodes relating to printing out an int value on the screen)
+
+04C4: store_coords_to 5@ 4@ 3@ from_actor $PLAYER_ACTOR with_offset 0.0 8.0 0.0
+0013: 5@ *= 2.0
+0092: 6@ = float 5@ to_integer 
+0513: text_1number_text_box 'SLOT_02' 6@
+
+03F0: enable_text_draw  1
+0001: wait  50 ms
+03F0: enable_text_draw  0
+0001: wait  50 ms
+0340: set_text_draw_RGBA 180 180 180 255 
+033F: set_text_draw_letter_size 1.0 1.0 
+03E4: set_text_draw_align_right 0 
+0341: set_text_draw_align_justify 0 
+0342: set_text_draw_centered 1 
+0343: set_text_draw_linewidth 640.0 
+0348: enable_text_draw_proportional 1 
+0345: enable_text_draw_background 0 
+060D: draw_text_shadow 0 rgba 0 0 0 180 
+0349: set_text_draw_font 2
+06E5: get_car $current_car possible_to_built_in_component_pool_index 0 itemID_to 27@
+045A: draw_text_1number 160.0 20.0 GXT 'NUMBER' number 27@
+06E5: get_car $current_car possible_to_built_in_component_pool_index 1 itemID_to 27@
+045A: draw_text_1number 160.0 30.0 GXT 'NUMBER' number 27@
+06E5: get_car $current_car possible_to_built_in_component_pool_index 2 itemID_to 27@
+045A: draw_text_1number 160.0 40.0 GXT 'NUMBER' number 27@
+*/

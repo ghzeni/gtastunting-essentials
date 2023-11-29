@@ -1,0 +1,1614 @@
+<html>
+	<head>
+		<title>Ultimate Stunter's SCM - Documentation</title>
+		<style>
+			body { background: #e5e5e5; color: #111; }
+			.page { max-width: 80%; margin: 3em auto; padding: 2em; background: #fafafa; border: 1px solid #ccc; }
+			h1, h2, h3, h4 { font-family: 'Trebuchet MS', Verdana, Aria, sans-serif; }
+			h1 { font-size: 1.5em; text-align: center; } .page h1:first-child { margin-top: 0; }
+			h2 { font-size: 1.2em; background: #0f1a35; padding: 5px; color: #fff; }
+			h3 { font-size: 0.85em; background: #c4ccdf; padding: 2px; }
+			h4 { font-size: 0.85em; border-bottom: 2px solid #c4ccdf; padding: 2px; }
+			p, h3, h4 { margin: 0 0 1em 0; }
+			th { text-align: left; }
+			.basic_table, .features_table { border-top: 1px solid #ccc; border-left: 1px solid #ccc; border-collapse: collapse; margin-bottom: 1em; }
+			.basic_table th, .basic_table td, .features_table th, .features_table td { padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; vertical-align: top; }
+			/*.basic_table td { border-left: 1px solid #ccc; }*/
+			.basic_table tr:nth-child(even) > th, .basic_table tr:nth-child(even) > td { background: #eee; }
+			a { color: inherit; }
+			h2 a { text-decoration: none; display: block; position: relative; } h2 a:hover { text-decoration: underline; }
+			h2 a:after { content: '(show/hide)'; position: absolute; right: 0; padding: 0 5px; font-size: 0.6em; }
+			.features_table { width: 100%; }
+			.features_table tr.feature td { display: none; }
+			.features_table tr.even > th, .features_table tr.even > td { background: #eee; }
+			.features_table tr.feature:hover > th, .features_table tr.feature:hover > td { background: #c5c5c5; }
+			.features_table .variant_selectors { display: inline-block; font-weight: normal; vertical-align: top; margin-left: 1em; }
+			.features_table .variant_selectors label { margin-right: 1em; display: inline-block; }
+			.features_table[data-show_variant1=t]  tr.feature td:nth-of-type(1) { display: table-cell; }
+			.features_table[data-show_variant2a=t] tr.feature td:nth-of-type(2) { display: table-cell; }
+			.features_table[data-show_variant2b=t] tr.feature td:nth-of-type(3) { display: table-cell; }
+			.features_table[data-show_variant3=t]  tr.feature td:nth-of-type(4) { display: table-cell; }
+			.features_table[data-show_variant4=t]  tr.feature td:nth-of-type(5) { display: table-cell; }
+			.chunky_list > li { margin-bottom: 1em; }
+			.disabled { color: #6a6a6a; font-style: italic; }
+			.jumplist { font-size: 0.75em; text-align: center; font-weight: bold; }
+			.jumplist a { color: #366bbd; }
+		</style>
+		<script type="text/javascript">
+			function toggle_section(section_heading_link)
+			{
+				var section_content = section_heading_link.parentNode.parentNode.children[1];
+				section_content.style.display = (section_content.style.display !== 'none') ? 'none' : 'block';
+				return false;
+			}
+			function toggle_variant_controls(variant_toggler)
+			{
+				var features_table = document.getElementById('features_table');
+				var variant_num = variant_toggler.value;
+				var coresp_attr = 'data-show_variant'+variant_num;
+				features_table.setAttribute(coresp_attr, variant_toggler.checked ? 't' : 'f');
+			}
+		</script>
+	</head>
+	<body>
+		<div class="page" id="top">
+			<h1>Ultimate Stunter's SCM (USCM) - Documentation - v4c</h1>
+			<div class="jumplist">
+				Jump to: 
+				<a href="#features_group" title="View Features & Controls">Features &amp; Controls</a>
+				 - 
+				<a href="#changelog_group" title="View Changelog">Changelog</a>
+			</div>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">1. Introduction</a></h2>
+				<div class="doc_group_content">
+					<table class="basic_table">
+						<tr>
+							<th>Title:</th>
+							<td>Ultimate Stunter's SCM</td>
+						</tr>
+						<tr>
+							<th>Author:</th>
+							<td>Dannye</td>
+						</tr>
+						<tr>
+							<th>Summary:</th>
+							<td>A "main.scm" mod with the goal of making stunting more user-friendly, by providing features
+								 that may be used to streamline some of the tedious processes surrounding finding/preparing
+								 stunt attempts, without affecting the stunts themselves.</td>
+						</tr>
+						<tr>
+							<th>Version:</th>
+							<td>v4c (April 2023)</td>
+						</tr>
+						<tr>
+							<th>Game:</th>
+							<td>GTA San Andreas (PC), plus the following San Andreas map-mods: "Alien City", and "GTA United"</td>
+						</tr>
+					</table>
+				</div>
+			</section>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">2. Installation</a></h2>
+				<div class="doc_group_content">
+					<p>Decide which map/mod you want to install this for and which variant of the USCM you wish to use, then enter into the corresponding sub-folder
+						and copy over each of the files into your corresponding game directory:</p>
+						
+					<table class="basic_table">
+						<tr>
+							<th>main.scm</th>
+							<td>Place a copy of this file in your <code>"\&lt;game-install-location&gt;\data\script"</code> directory</td>
+						</tr>
+						<tr>
+							<th>script.img</th>
+							<td>Place a copy of this file in your <code>"\&lt;game-install-location&gt;\data\script"</code> directory</td>
+						</tr>
+						<tr>
+							<th>american.gxt</th>
+							<td>Place a copy of this file in your <code>"\&lt;game-install-location&gt;\text"</code> directory
+								<br>&nbsp;&nbsp;<em>(this file is the same regardless of which variant/map-mod you choose)</em></td>
+						</tr>
+					</table>
+					<p>Consider making a backup of any existing versions of files before replacing them.</p>
+					<h3>Regarding Save Games:</h3>
+					<ul>
+						<li>The main.scm files included in this project will be incompatible with savegames created using any other main.scm file
+							 (including those from a prior version of this project). If you need to keep using a previous savegame it may be
+							 preferable to not update to this latest version of the USCM. If you do intend to use this latest USCM, you will need
+							 to start with a "New Game" on first use.</li>
+						<li>The San Andreas USCM in this package retains all of the standard mission scripts for the game, so you can stunt 
+							as well as play through the	game normally, if desired. To prevent this from being an issue for stunters, this USCM 
+							also includes code to try and ensure that the entire map is "unlocked" from the beginning (various dynamic game-world
+							objects are set to their end-game state: for example, bridges are open and thus all islands accessible, ramps and 
+							parked-vehicle spawns that may only become available after certain missions will be available immediately, etc).</li>
+					</ul>
+				</div>
+			</section>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">3. Controlling the USCM - Overview</a></h2>
+				<div class="doc_group_content">
+					<p>
+						USCM features are assigned to specific combinations of in-game actions, which your in-game control settings map to specific buttons on your input device.
+						For example, if a USCM feature uses "Sprint", the button you must press is the one you have mapped to "Sprint" in your game settings (perhaps "Shift", if you use keyboard).
+					</p>
+					<p>
+						To attempt to create a usable USCM supporting stunters with different input devices and/or control mappings, multiple <em>variants</em> have been included,
+						each differing on the assigned actions for certain features. For whichever variant you pick, you may also wish to make changes to your in-game control 
+						mapping to try and make the USCM work best for you.
+					</p>
+					<p>The five USCM variants provided are as follows:</p>
+					<table class="basic_table">
+						<tr>
+							<th>Title</th>
+							<th>Description</th>
+							<th>Title from prior releases</th>
+						</tr>
+						<tr>
+							<th>1.&nbsp;Default</th>
+							<td>The controls as originally designed</td>
+							<td>Standard</td>
+						</tr>
+						<tr>
+							<th>2a.&nbsp;(Partial)&nbsp;Streamlined&nbsp;Default</th>
+							<td>The default with minor changes, mostly aiming for simpler combinations</td>
+							<td>Dannye</td>
+						</tr>
+						<tr>
+							<th>2b.&nbsp;(VC-style)&nbsp;Streamlined&nbsp;Default</th>
+							<td>Like 2a but a bit more streamlined, and more similar to the VC USCM 'Streamlined Default'</td>
+							<td><em>n/a</em></td>
+						</tr>
+						<tr>
+							<th>3.&nbsp;Streamlined&nbsp;Alternate</th>
+							<td>The default with even more changes, also aiming for simple combinations</td>
+							<td><em>n/a</em></td>
+						</tr>
+						<tr>
+							<th>4.&nbsp;Limited</th>
+							<td>A very different set of controls without support for the full featureset, not recommended for use unless you have used it in the past</td>
+							<td>Gamepad; Legacy (Limited)</td>
+						</tr>
+					</table>
+					<p>The 1, 2b, 3 and 4 variants are consistent (where possible/appropriate) with their equivalents in the VC USCM (note that between 2a and 2b here, it is 2b that is most like VC's 'Streamlined Default').</p>
+					
+					<h3>Regarding Input Devices (and Gamepad Stunting):</h3>
+					<ul>
+						<li>All USCM variants attempt to support any input device, including gamepads. Previous releases of the USCM were more restrictive here, with Streamlined Alternate and Legacy/Limited
+							being the two built specifically for gamepad stunting. One of those may still be prefered for gamepad stunters, however all variants should support gamepads just as well as each other.
+							For example, any Feature listed as requiring a directional movement (forward/backward/left/right) will be successfully triggered by either a corresponding 'button' or 'analog stick' push.</li>
+					</ul>
+				</div>
+			</section>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group" id="features_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">4. USCM Features &amp; Controls</a></h2>
+				<div class="doc_group_content">
+					<p>
+						Use the table below to view all the Features of the USCM and the associated in-game actions which trigger them.
+						The checkboxes along the top can be used to filter which variants of the USCM you are interested in, and can be used to compare the controls between different variants.
+						Click on the name of a Feature to show/hide additional information about it.
+					</p>
+					
+					<style>
+						.features_table th.feature_detail_toggle { padding: 0; }
+						.feature_detail_toggle a { padding: 5px; display: block; text-decoration: none; }
+						.feature_detail_toggle a:hover { background: #afc5f9; }
+						.feature_detail td { display: none; }
+						.feature_detail[data-status=shown] td { display: table-cell; }
+					</style>
+					<script type="text/javascript">
+						function toggle_feature_details(detail_hook)
+						{
+							var details_row = document.getElementById(detail_hook);
+							details_row.setAttribute('data-status', (details_row.getAttribute('data-status') == 'shown') ? 'hidden' : 'shown');
+							return false;
+						}
+						function toggle_all_feature_details(toggle)
+						{
+							var cur_status = toggle.getAttribute('data-toggle_all_mode');
+							var new_status = (cur_status == 'shown') ? 'hidden' : 'shown';
+							toggle.setAttribute('data-toggle_all_mode', new_status)
+							var details_rows = document.querySelectorAll('.feature_detail');
+							details_rows.forEach(function(details_row) { details_row.setAttribute('data-status', new_status); });
+							return false;
+						}
+					</script>
+					
+					<table class="features_table" data-show_variant1="t" data-show_variant2a="t" data-show_variant2b="t" data-show_variant3="t" data-show_variant4="t" id="features_table">
+						<tr>
+							<th>Feature: 
+								<div style="font-size: 0.75em;color: #366bbd;">
+									(click each to see more details) &nbsp; - &nbsp; <a href="#" title="Show/Hide All additional feature details" onclick="return toggle_all_feature_details(this);" data-toggle_all_mode="hidden">Toggle All</a>
+								</div>
+							</th>
+							<th colspan="5">
+								Controls per USCM variant:
+								<div class="variant_selectors">
+									<label title="Show/Hide Controls for this variant"><input type="checkbox" name="show_variant" onchange="toggle_variant_controls(this);" value="1" checked="checked"> Default</label>
+									<label title="Show/Hide Controls for this variant"><input type="checkbox" name="show_variant" onchange="toggle_variant_controls(this);" value="2a" checked="checked"> (Partial) Streamlined Default</label>
+									<label title="Show/Hide Controls for this variant"><input type="checkbox" name="show_variant" onchange="toggle_variant_controls(this);" value="2b" checked="checked"> (VC-style) Streamlined Default</label>
+									<label title="Show/Hide Controls for this variant"><input type="checkbox" name="show_variant" onchange="toggle_variant_controls(this);" value="3" checked="checked"> Streamlined Alternate</label>
+									<label title="Show/Hide Controls for this variant"><input type="checkbox" name="show_variant" onchange="toggle_variant_controls(this);" value="4" checked="checked">Limited</label>
+								</div>
+							</th>
+						</tr>
+						<tr class="feature even">
+							<th>&nbsp;</th>
+							<td><strong>Default</strong></td>
+							<td><strong>(Partial) Streamlined Default</strong></td>
+							<td><strong>(VC-style) Streamlined Default</strong></td>
+							<td><strong>Streamlined Alternate</strong></td>
+							<td><strong>Limited</strong></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spawner_sets');">Vehicle Spawner Set 1a/b</a></th>
+							<td>Sprint + Aim + MoveLeft</td>
+							<td>Sprint + Aim + MoveLeft</td>
+							<td>Sprint + Aim + MoveLeft</td>
+							<td>Sprint + Fire + MoveLeft</td>
+							<td>EnterVehicle + PrevWeapon</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spawner_sets');">Vehicle Spawner Set 2a/b</a></th>
+							<td>Sprint + Aim + MoveRight</td>
+							<td>Sprint + Aim + MoveRight</td>
+							<td>Sprint + Aim + MoveRight</td>
+							<td>Sprint + Fire + MoveRight</td>
+							<td>EnterVehicle + NextWeapon</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spawner_sets');">Vehicle Spawner Set 3a/b</a></th>
+							<td>Sprint + Aim + MoveForward</td>
+							<td>Sprint + Aim + MoveForward</td>
+							<td>Sprint + Aim + MoveForward</td>
+							<td>Sprint + Fire + MoveForward</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spawner_sets');">Vehicle Spawner Set 4a/b</a></th>
+							<td>Sprint + Aim + MoveBackward</td>
+							<td>Sprint + Aim + MoveBackward</td>
+							<td>Sprint + Aim + MoveBackward</td>
+							<td>Sprint + Fire + MoveBackward</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_spawner_sets">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will spawn a set of 8 vehicles surrounding the player's current position</li>
+									<li>For each spawner, a different set of vehicles will spawn if triggered while Jetpack is enabled</li>
+									<li>Normal on-foot spawners:
+										<br>1a. Commonly used stunting vehicles
+										<br>2a. Additional common stunting vehicles
+										<br>3a. Other fast cars
+										<br>4a. Offroad, gang-variant, and with-back-tray vehicles</li>
+									<li>Alternate while-jetpacking spawners:
+										<br>1b. Boats
+										<br>2b. Planes/Helicopters
+										<br>3b. Service vehicles (eg. police/ambulance/fire)
+										<br>4b. Misc vehicles</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spawner_random');">Spawn random vehicle</a></th>
+							<td>Sprint + Aim + Shoot</td>
+							<td>Sprint + Aim + Shoot</td>
+							<td>Sprint + Aim + Shoot</td>
+							<td>Sprint + Crouch</td>
+							<td>PrevWeapon + NextWeapon</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_spawner_random">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will spawn a single random vehicle directly in front of the player</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_spoosh');">'Remember' current vehicle</a></th>
+							<td>Handbrake + Radio</td>
+							<td>Handbrake + Radio</td>
+							<td>Handbrake + Radio</td>
+							<td>Submission + Radio</td>
+							<td>Horn + Submission</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_spoosh">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Normal game behaviour is to only keep track of your current and previous vehicle, any others you
+										had been in prior will have the potential to be removed/despawn (usually subject to how far away
+										you move from the vehicle, and/or whether it remains in your line-of-view). This feature will ensure that 
+										the current vehicle the player is in will never be subject to this behaviour, and will continue to
+										exist after entering multiple subsequent vehicles, no matter how far away you move from it.</li>
+									<li>Once it has been activated for a vehicle it cannot be deactivated. (Thus, for game stability, it is best
+										not to activate it on too many vehicles in the same game session)</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_flip');">Flip current car back onto wheels</a></th>
+							<td>Horn + Radio</td>
+							<td>Horn + Radio</td>
+							<td>Horn + Radio</td>
+							<td>Submission + Horn</td>
+							<td>LookLeft + LookRight</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_flip">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>If your current vehicle is upside-down (or on its side closer to being upside-down than rightside-up),
+										this will flip your vehicle back onto its wheels.</li>
+									<li>It is intended for use while the vehicle is on the ground, and thus actually 'stuck' on its roof, but that is not a requirement.</li>
+									<li>It will not work if you are on a bike.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_prev_pref');">Toggle last/2ndlast prior vehicle preference</a></th>
+							<td>Aim + Action + MoveLeft</td>
+							<td>Aim + Action + MoveLeft</td>
+							<td>Aim + Action + MoveLeft</td>
+							<td>Aim + Action + MoveLeft</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_prev_pref">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>The following on-foot features will have some interaction with a prior vehicle:
+										<ul><li>Take player to prior vehicle</li>
+											<li>Bring prior vehicle to player</li>
+											<li>Teleport - Load Location (may put player in prior vehicle)</li>
+											<li>Stats Overlay (showing vehicle speed/health while on-foot)</ul></li>
+									<li>This will toggle which of the player's prior vehicles (last, or 2nd-last) that these related features will act upon.
+										Regardless of the state of this toggle, all of those features will still only act on the corresponding vehicle if is
+										deemed to still exist and be usable. For example: if the toggle is set to 2nd-last vehicle, but it has been destroyed,
+										none of these features will work (teleport would act as an on-foot teleporter only, without placing you in a car), even
+										if you do have an acceptable last-vehicle available.</li>
+									<li>Example of the dynamic nature of this toggle: if your last vehicle was a PCJ, your second last was a Packer, both are still available, 
+										and this toggle set to 2nd-last vehicle - when you activate a Teleport Load Position 1 it will put you in that position inside the Packer
+										(your 2nd-last vehicle); now that you are in the Packer it becomes your last-vehicle, and the PCJ your 2nd-last vehicle, and as such, 
+										upon exiting the Packer and activating a Teleport Load Position 2, you will be put in that position in the PCJ; and it would continue to alternate
+										like that until you toggle this feature back to last-vehicle.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_rep_cut');">Toggle Always cut replay on teleport load</a></th>
+							<td>Aim + Action + MoveRight</td>
+							<td>Aim + Action + MoveRight</td>
+							<td>Aim + Action + MoveRight</td>
+							<td>Aim + Action + MoveRight</td>
+							<td>Aim + Action + MoveBackward</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_rep_cut">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle the behaviour of <strong>always</strong> 'cutting the Replay' (clearing the Replay buffer) whenever a Teleport Load is performed.</li>
+									<li>Note: Normal USCM behaviour has always been to cut the Replay on specifically a foot-to-vehicle Teleport Load, and this will continue to be the
+											  case <strong>regardless</strong> of this feature. Thus, having this toggle disabled will only prevent the replay cut from occurring in 
+											  other Teleport Load scenarios (already-in-vehicle, and foot-without-vehicle).</li>
+									<li>The benefit of this feature is in ensuring that failed stunt attempts are not cluttering up the Replay file ahead of a successful attempt.
+									    However you must be sure you <strong>never perform a Teleport Load after a successful stunt, prior to saving the Replay, or that stunt will be lost</strong>
+										 (even if this feature is disabled, you must also keep this in mind for foot-to-vehicle Teleport Loads, as has always been the case for the USCM).</li>
+									<li>Also note, the normal method for clearing the Replay buffer - starting playback of a previously captured Replay - is still available, as always.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_nor_snap');">Toggle Bike Teleport Snap-to-North</a></th>
+							<td>Aim + Action + MoveForward</td>
+							<td>Aim + Action + MoveForward</td>
+							<td>Aim + Action + MoveForward</td>
+							<td>Aim + Action + MoveForward</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_nor_snap">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle special bike-only Teleport Load behaviour which has the effect of Loading you facing perfectly North, as long 
+										as the Saved Teleport Location had you facing within 15 degrees either side of North.</li>
+									<li>Enabling this toggle will not affect Teleport Loads in any other context (on-foot-only teleports, on vehicle-based ones that involve a non-bike vehicle).</li>
+									<li>Note: If the vehicle is a bicycle/bmx/mountain-bike, and your USCM variant is one where the MoveLeft/Right buttons are involved with the combination
+										to trigger a Teleport Load, the slight lean caused by the left/right action could alter your angle just enough to interfere with this feature, leading you
+										to be slightly off perfect North even with this feature enabled. The order &amp; time which you press the buttons to trigger the teleport may lessen the
+										severity here, as should Teleport Loads that are triggered while on-foot. This is not an issue for motorised bikes, nor USCM variants that do not use
+										left/right movement actions in their trigger.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_stats');">Cycle Stats Overlay Mode</a></th>
+							<td>Aim + Action + MoveBackward</td>
+							<td>Aim + Action + MoveBackward</td>
+							<td>Aim + Action + MoveBackward</td>
+							<td>Aim + Action + MoveBackward</td>
+							<td>Aim + Action + MoveForward</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_stats">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will cycle through each supported mode of the Stats Overlay feature - each one varying on the details they show and where on the screen they get shown:
+										<ol start="0">
+											<li>Overlay Disabled <em>(Default)</em></li>
+											<li>Overlay Enabled - Shows Location Stats (on bottom) &amp; Vehicle Stats (on side)</li>
+											<li>Overlay Enabled - Shows Location Stats &amp Vehicle Stats (both on side)</li>
+											<li>Overlay Enabled - Shows Speed-only (in middle)</li>
+											<li>Overlay Enabled - Shows Speed-only (on bottom)</li>
+										</ol>
+										Each time this feature is triggered it will cycle to the next mode in this sequence, returning to Disabled if triggered from the last one.
+										<br>
+										While enabled, these displayed details will be constantly updated/maintained.
+									</li>
+								</ul>
+								<ul>
+									<li>Location Stats:
+										<ul>
+											<li>The coordinations (X/Y/Z) and angle of the player (or the vehicle they are in)</li>
+											<li>The X and Y coordinate values will be shown via a decimal number (2dp), while the Z coordinate and Angle will be shown via a whole number.</li>
+										</ul>
+									</li>
+									<li>Vehicle Stats:
+										<ul>
+											<li>The Speed and Health of the active/desired vehicle</li>
+											<li>The Speed value will be shown in units appropriate to your computer's locale (as best determined via the San Andreas game code),
+												thus should appear in either Miles per Hour or Kilometers per Hour as appropriate</li>
+											<li>While the player is in a vehicle, the Speed and Health stats will correspond to that vehicle.
+												While the player is on-foot, the Speed and Health stats may still be shown, now based off a prior vehicle 
+												(subject to the associated Prior Vehicle Preference toggle), as long as it remains available/accessable.
+												If no such vehicle is available, these two values will not be printed.</li>
+										</ul>
+									</li>
+								</ul>
+								<ul>
+									<li>Compatibility Notes:
+										<ul>
+											<li>For the modes which display any/all of their Stats at the bottom (1 and 4), there is a potential conflict with the display of "Insane Stunt Bonus" (ISB) text,
+												as those messages are displayed in the same location on the screen. For San Andreas the ISB text will take priority, and thus for the few 
+												seconds they are shown upon their generation, the 'bottom' Stats associated with this feature will not be shown. <em>(Note that this differs from the
+												VC USCM, where the conflict still exists but the USCM's Stats take priority, and thus the ISB text would never be seen if using one of these modes).</em>
+												<ul><li>Thus if don't want to have any such conflict, you may prefer to use modes 2 or 3 of this feature instead</li></ul>
+											</li>
+											<li>For the modes which display any/all of their Stats <strong>not</strong> at the bottom (1, 2, 3), there is a rendering issue if playing the game with the
+												'Frame Limiter' disabled (FL-off; it is normally left on/enabled, and most stunters choose to leave it this way) which causes this text to constantly flicker.
+												<ul><li>Thus if stunting with FL-off, you may wish to use mode 4 instead, as it is bottom-only and so does not flicker (though can only show Speed)</li></ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_metocar');">Take player to prior vehicle</a></th>
+							<td>Sprint + PrevWeapon</td>
+							<td>Sprint + PrevWeapon</td>
+							<td>Sprint + PrevWeapon</td>
+							<td>Fire + Aim</td>
+							<td>EnterVehicle + Shoot</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_metocar">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will teleport the player to the location of the prior vehicle (subject to the associated Prior Vehicle Preference toggle),
+										if it exists and is not destroyed. Player will be placed just behind the vehicle, facing towards it.</li>
+									<li>Using this feature will not	interfere with the proper Teleport feature and its saved locations.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_cartome');">Bring prior vehicle to player</a></th>
+							<td>Sprint + NextWeapon</td>
+							<td>Sprint + NextWeapon</td>
+							<td>Sprint + NextWeapon</td>
+							<td>Fire + Action</td>
+							<td>LookBehind</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_cartome">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will teleport the prior vehicle (subject to the associated Prior Vehicle Preference toggle) to the player,
+										if it exists and is not destroyed. Vehicle will be placed just in-front of the player, facing the same direction as the player.</li>
+									<li>Using this feature will not	interfere with the proper Teleport feature and its saved locations.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_seecar');">Show 2nd-last-used vehicle</a></th>
+							<td>Jump + PrevWeapon</td>
+							<td>Jump + PrevWeapon</td>
+							<td>Jump + PrevWeapon</td>
+							<td>Fire + PrevWeapon</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_seecar');">Show last-used vehicle</a></th>
+							<td>Jump + NextWeapon</td>
+							<td>Jump + NextWeapon</td>
+							<td>Jump + NextWeapon</td>
+							<td>Fire + NextWeapon</td>
+							<td>EnterVehicle + Action</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_seecar">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle the camera to go and look-at/follow the corresponding vehicle (if exists), rather than point at the on-foot player.
+										The camera will then act just like the standard 3rd-person in-vehicle camera:
+										<ul>
+											<li>Will follow at a distance (short/medium/far) consistent with whichever you last used when in a vehicle</li>
+											<li>You will be able to rotate the camera around the vehicle just like you normally can</li>
+											<li>You will also be able to see from different angles via the game's look-left/right/behind functionality* <em>(See note below)</em></li>
+										</ul></li>
+									<li>Triggering either of these features while already enabled for the corresponding vehicle will disable it, whereas if the vehicle
+										corresponding to the request is different to the one it was already enabled for, the camera will swap over to the new vehicle.</li>
+									<li>Note: To trigger the look-left/right-behind behaviour while using this feature, you cannot use the standard buttons for doing so, instead you
+											  will need to use the PrevWeapon and NextWeapon buttons - they will act just like pressing LookLeft and LookRight respectively
+											  (and thus holding both down will activate look-behind). To best achieve this, you will want to be able to trigger the weapon scroll actions
+											  via buttons that can be held down (and thus if you normally only use the mouse wheel for such tasks, you may want to map an alternate button
+											  for each of those actions).</li>
+									<li>Note: Some other game/USCM features can automatically disable this feature. In this case, if you wish to subsequently enable it on
+											  the exact same vehicle it was previously enabled for, you may need to trigger the feature twice to properly enable it
+											  (once to 'wake it up' and realise it is disabled, and once again to then successfully enable it).</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_ghost');">Toggle 'Ghost Town'</a></th>
+							<td>Crouch + Sprint</td>
+							<td>Crouch + TalkNo</td>
+							<td>Crouch + Action</td>
+							<td>Crouch + Action</td>
+							<td>Crouch</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_ghost">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle the presence of any other pedestrian characters/vehicles in the game.</li>
+									<li>When enabled while the player has a wanted-level, police characters will still appear, and police helicopters may spawn too,
+										but all other police vehicles will be absent.</li>
+									<li>When the USCM is used in a map-mod that doesn't feature any pedestrian or vehicle paths, this feature will not have any effect.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_pvul');">Toggle player vulnerability</a></th>
+							<td>Crouch + LookBehind</td>
+							<td>Crouch + TalkYes</td>
+							<td>Crouch + LookBehind</td>
+							<td>Crouch + Aim</td>
+							<td>ChangeCamera</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_pvul">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle the player being immune-or-not to bullets, fire, explosion, collision, and melee.</li>
+									<li>Regardless of the setting of this toggle, the player's health and armour will be constantly maintained at their maximum level.</li>
+									<li>Note that fire immunity only determines whether the player can catch fire and react to fire.
+										Regardless of the status of this feature, the player will retain maximum health and not be damaged by fire.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_weather');">Set/Clear Weather</a></th>
+							<td>Action + LookBehind</td>
+							<td>Action + LookBehind</td>
+							<td>Action + LookBehind</td>
+							<td>Crouch + Jump</td>
+							<td>Aim + Action + MoveLeft</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_weather">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>[Context] The available game weather types are: Extra Sunny (LS), Sunny (LS), Extra Sunny Smog (LS), Sunny Smog (LS), Cloudy (LS), 
+										Sunny (SF), Extra Sunny (SF), Cloudy (SF), Rainy (SF), Foggy (SF), Sunny (LV), Extra Sunny (LV), Cloudy (LV), Extra Sunny (Countryside), 
+										Sunny (Countryside), Cloudy (Countryside), Rainy (Countryside), Extra Sunny (Desert), Sunny (Desert), Sandstorm (Desert), and Underwater.</li>
+									<li>This will change (and lock) the weather at the next one in this sequence on each activation.</li>
+									<li>When activated while on the final locked weather type, it will instead unlock the weather, allowing the game
+										to return to its natural behaviour of weather changing at random. The next activation of this feature afterwards
+										will return to having locked weather, beginning back at the start of the cycle.</li>
+									<li>Note: the unlocked/natural weather option is only available here while Time is Not Frozen (otherwise strange weather behaviour may occur).
+										As a result, if this feature is used to cycle through the weather types while Time is Frozen, it will skip over the unlocked/natural
+										weather option (going straight from last-in-cyle to first-in-cycle, always locked). In addition, if the Frozen Time toggle is activated while
+										the weather is set as unlocked/natural, then it will automatically force/lock the weather to the first type in sequence.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_time');">Toggle Frozen Time</a></th>
+							<td>Crouch + ChangeCamera</td>
+							<td>Crouch + Sprint</td>
+							<td>Crouch + Sprint</td>
+							<td>Crouch + Fire</td>
+							<td>Aim + Action + MoveRight</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_time">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>This will toggle between letting the in-game time advance as normal (and thus experiencing the full day-night cycle) 
+										and having it frozen at its current point. While it is frozen the game will no longer advance time its usual 6 hours when making a save.</li>
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_water');">Place in/underwater current vehicle on land</a></th>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_water">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle, in water or underwater</em></p>
+								<ul>
+									<li>Will teleport the player/vehicle out of the water and onto the closest known point on the ground where vehicles may drive.</li>
+									<li>This feature will not perform if the player is in a boat, hovercraft, or a water-based air-vehicle (skimmer or sea-sparrow).</li>
+									<li>Using this feature will not	interfere with the proper Teleport feature and its saved locations.</li>
+									<li>When the USCM is used in a map-mod that doesn't feature any vehicle paths, the location may be unpredictable/undesirable.</li>
+									<li>Note: If the player is on-foot and in/underwater, this feature is not available or necessary - jetpack can be activated and they can fly out manually.</li>
+								</ul>
+								<p>* Alternate approach/behaviour when used in map-mods that don't feature any vehicle paths (required for the primary approach defined above):</p>
+								<ul>
+									<li>If the feature is used in such a scenario, it will instead take the player out of the vehicle and automatically enable Jetpack, at which point
+										the player is free to move themselves out of the water to any desired location.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_jetpack');">Jetpack - Enable</a></th>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td>ChangeCamera</td>
+							<td>Aim + EnterVehicle</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_jetpack');">Jetpack - Disable</a></th>
+							<td>ChangeCamera or EnterVehicle</td>
+							<td>ChangeCamera or EnterVehicle</td>
+							<td>ChangeCamera or EnterVehicle</td>
+							<td>ChangeCamera or EnterVehicle</td>
+							<td>EnterVehicle</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_jetpack">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will toggle on/off 'jetpack mode' for the player, allowing the player to rapidly move ('fly') around the map in any direction without a vehicle.</li>
+									<li>While enabled, the jetpack supports the following movement controls: move-forward, move-backward, move-left, move-right, move-up and move-down.
+										The player can be moved in more than one of these directions at the same time (eg. diagonally forward + left, backwards + down, etc), and this
+										will also have the effect of increasing the movement speed of the jetpack. Alternatively, you can optionally activate slower jetpack movements.</li>
+									<li>While enabled, the jetpacking player can also be turned/rotated to face a different direction.</li>
+									<li>All on-foot USCM features remain available for use/activation while the jetpack is enabled.</li>
+									<li>The jetpack will not be allowed to remain active when the player is in a vehicle - it will be automatically deactivated if a Teleport Load, which places
+										the player inside a prior vehicle, is performed; it will also be deactivated at any time the Enter/Exit Vehicle button is pressed, regardless/in-addition-to
+										the standard toggle buttons used to enable/disable it.</li>
+									<li>Note: If you jetpack into/through a vehicle, you may despawn it (make it disappear). This can occur even to a vehicle that you have previously occupied,
+										unless the 'Remember' Vehicle feature had been activated for it at any point prior. This ability can be utilised to intentionally remove a prior player 
+										vehicle without	needing	to enter new ones to have it become old enough for the game to potentially despawn it naturally.</li>
+								</ul>
+								<ul>
+									<li><strong>Movement Controls while Jetpacking:</strong>
+										<ul>
+											<li>All variants except Limited:
+												<ul>
+													<li>forward/backward/strafe-left/strafe-right jetpack movements are triggered by the corresponding on-foot normal player movements</li>
+													<li>upwards   movement triggered by Jump button</li>
+													<li>downwards movement triggered by Crouch button</li>
+												</ul>
+											</li>
+											<li>The Limited variant:
+												<ul>
+													<li>forward/backward jetpack movements are triggered by the corresponding on-foot normal player movements (strafe-left/strafe-right are disabled)</li>
+													<li>upwards   movement triggered by Aim + PrevWeapon</li>
+													<li>downwards movement triggered by Aim + NextWeapon</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+								<ul>
+									<li><strong>Turning Controls while Jetpacking:</strong>
+										<ul>
+											<li>All variants except Limited: turn/rotate the player via your normal on-foot controls for looking left/right</li>
+											<li>The Limited variant: turn/rotate the player via your normal on-foot controls for moving left/right</li>
+										</ul>
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_wanted');">Wanted Level - Increase</a></th>
+							<td>Action + Shoot + PrevWeapon</td>
+							<td>Action + Shoot + PrevWeapon</td>
+							<td>Action + Shoot + PrevWeapon</td>
+							<td>LookBehind + Jump</td>
+							<td>Action + NextWeapon</td>
+						</tr>
+						<tr class="feature even">
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_wanted');">Wanted Level - Decrease/Clear</a></th>
+							<td>Action + Shoot + NextWeapon</td>
+							<td>Action + Shoot + NextWeapon</td>
+							<td>Action + Shoot + NextWeapon</td>
+							<td>LookBehind + Fire</td>
+							<td>Action + PrevWeapon</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_wanted">
+							<td colspan="6">
+								<p><em>Required player status: On-foot</em></p>
+								<ul>
+									<li>Will either increase or decrease the current number of 'Wanted Stars' are assigned to the player (affecting the level of police attention to the player).</li>
+									<li>The levels that can be cycled are as follows: 0, 1, 2, 3, 4, 5, 6. Trying to increase past 6, or decrease below 0, will have no effect.</li>
+									<li>While at the 0 level, the player will be ignored by all NPCs (non-player-characters), and will not be able to naturally attract any police attention (thus wanted level).</li>
+									<li>While at any level 1 or above, NPCs (non-player-characters) will pay attention to the players actions, and it will be possible to attract further police attention naturally.</li>
+									<li>Regardless of the level activated by this setting, the player will always be set as being unable to be 'carjacked' from their vehicle, and thus cannot be 'busted'.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_carcol');">Change current vehicle colours</a></th>
+							<td>Submission + LookRight</td>
+							<td>Submission + LookLeft</td>
+							<td>Submission + LookLeft</td>
+							<td>Submission + LookRight</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_carcol">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Will select a new random pair of primary and secondary paint colours and apply them to your current vehicle.</li>
+									<li>Vehicles with specialised colours/skins may not be affected by this feature.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feature_cvul');">Toggle current/future vehicle vulnerability</a></th>
+							<td>Submission + LookLeft</td>
+							<td>Submission + LookRight</td>
+							<td>Submission + LookRight</td>
+							<td>Submission + LookLeft</td>
+							<td>Submission + ChangeCamera</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feature_cvul">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Will toggle the current vehicle being immune-or-not to bullets, fire, explosion, and collision.
+										Whenever the player enters the new vehicle, the last-triggered state of this toggle will be applied/maintained for it too.</li>
+									<li>Only when this toggle is set to invulnerable will the health of the current vehicle be constantly maintained at its maximum level.</li>
+									<li>If the player is in a Tank while this feature is toggled as vulnerable, they will still be set as invulnerable to explosions and bullets, which is natural behaviour for tanks in the game.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feature_hyd_install');">Toggle Hydraulics installed on vehicle</a></th>
+							<td>Submission + Handbrake</td>
+							<td>Submission + Handbrake</td>
+							<td>Submission + Handbrake</td>
+							<td>Radio      + Handbrake</td>
+							<td><abbr title="Configured only via 'On Foot' controls in-game, but also works while in vehicle">TalkNo</abbr></td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feature_hyd_install">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Will toggle the installation of a Hydraulics component in your current vehicle.</li>
+									<li>Will have no effect if the vehicle does not support having Hydraulics installed in it.</li>
+									<li>Note: Despite the Sandking being unable to have Hydraulics added at a mod-shop,
+											  the USCM includes an exception to <strong>allow</strong> Hydraulics to be installed on it via this feature.
+											  This exception has been made because the game includes a 'parked car' location for this vehicle which will sometimes
+											  spawn it with Hydraulics installed (the location being under the satellite dish in the desert).</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feature_orw_install');">Toggle Offroad Wheels installed on vehicle</a></th>
+							<td>Submission + Horn</td>
+							<td>Submission + Horn</td>
+							<td>Submission + Horn</td>
+							<td>Radio      + Horn</td>
+							<td><abbr title="This 'On Foot' (Talk Yes) and 'In Vehicle' (Trip Skip) control are one and the same, sharing the buttons assigned to them">TalkYes/TripSkip</abbr></td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feature_orw_install">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Will toggle the installation of 'Offroad Wheels' in your current vehicle.</li>
+									<li>Will have no effect if the vehicle does not support having vehicle mods (and thus custom wheels) installed in it.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feature_nos_use');">Trigger shot of NOS</a></th>
+							<td>Secondary Fire</td>
+							<td>Secondary Fire</td>
+							<td>Secondary Fire</td>
+							<td>Secondary Fire</td>
+							<td>Secondary Fire</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feature_nos_use">
+							<td colspan="6">
+								<p><em>Required player status: In-vehicle</em></p>
+								<ul>
+									<li>Will immediately trigger a shot of NOS in your current vehicle, without being subject to 'cool down' or usage limits
+										(as it would were it used via the standard in-game NOS-activation button: Fire).</li>
+									<li>Will have no effect if the vehicle does not <strong>support</strong> having the NOS-bottle car-mod - it does not need to be installed, the car just needs to <strong>support</strong> it for this feature to be allowed.</li>
+								</ul>
+								<ul>
+									<li>It is recommended that you <strong>do not</strong> install any of the proper NOS-bottle car-mods on your vehicle, and instead just rely on this feature to trigger a shot of NOS whenever you want one 
+										(as this feature does not require that the proper NOS component is installed, only that the car supports having it). If you do have the proper component installed on your vehicle,
+										the following NOS-related issues may arise:
+										<ul>
+											<li>Triggering NOS via this USCM feature removes the NOS bottle once the NOS shot concludes - a game quirk, making it somewhat pointless having installed it in the first place</li>
+											<li>Triggering any USCM feature that involves the FIRE key will also trigger the NOS - a button conflict, likely causing unintentional/undesired NOS triggering</li>
+											<li>Triggering a foot-to-car teleport load will also trigger the NOS - a game quirk, likely causing unintentional/undesired NOS triggering</li>
+										</ul>
+										And thus, don't worry about properly installing NOS in your car, just use this feature to trigger a shot at-will, as it works fine (and indeed works best) without it.
+										<br><em>(Though note that NOS is silently-but-automatically installed in all Taxis, so the latter two issues noted above unfortunately may still arise when driving a Taxi)</em>
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_save');">Initiate Save Game screen/prompt</a></th>
+							<td>Aim + LookBehind</td>
+							<td>Aim + LookBehind</td>
+							<td>Aim + LookBehind</td>
+							<td>Aim + LookBehind</td>
+							<td>Aim + Action + Sprint</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_save">
+							<td colspan="6">
+								<p><em>Required player status: On-foot, NOT on a mission</em></p>
+								<ul>
+									<li>Will trigger the in-game save screen, allowing you to save your game at any time.</li>
+									<li>The saved game, via this method, will remember if you were jetpacking at the time and you will continue to be when the game is loaded.</li>
+									<li>Note: A saved game (via this, or normal methods) will remember the state of most features of this USCM, including your saved teleport locations.</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Save Location 1 (on foot)</a></th>
+							<td>Sprint	  + LookBehind + MoveLeft</td>
+							<td>Sprint    + TalkNo</td>
+							<td>Sprint    + Action</td>
+							<td>Jump      + Aim</td>
+							<td>Jump	  + Next Weapon</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Save Location 2 (on foot)</a></th>
+							<td>Sprint	  + LookBehind + MoveRight</td>
+							<td>Sprint    + TalkYes</td>
+							<td>Sprint    + LookBehind</td>
+							<td>Jump      + Action</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Load Location 1 (on foot)</a></th>
+							<td>Sprint	  + Shoot + MoveLeft</td>
+							<td>Jump      + TalkNo</td>
+							<td>Jump      + Action</td>
+							<td>Sprint    + Aim</td>
+							<td>Jump + PrevWeapon</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Load Location 2 (on foot)</a></th>
+							<td>Sprint	  + Shoot + MoveRight</td>
+							<td>Jump      + TalkYes</td>
+							<td>Jump      + LookBehind</td>
+							<td>Sprint    + Action</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Save Location 1 (in vehicle)</a></th>
+							<td>Horn	  + LookBehind + MoveLeft</td>
+							<td>Horn      + LookLeft</td>
+							<td>Horn      + LookLeft</td>
+							<td>Horn      + LookLeft</td>
+							<td>Shoot + Radio</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Save Location 2 (in vehicle)</a></th>
+							<td>Horn      + LookBehind + MoveRight</td>
+							<td>Horn      + LookRight</td>
+							<td>Horn      + LookRight</td>
+							<td>Horn      + LookRight</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Load Location 1 (in vehicle)</a></th>
+							<td>Horn      + Shoot + MoveLeft</td>
+							<td>Handbrake + LookLeft</td>
+							<td>Handbrake + LookLeft</td>
+							<td>Handbrake + LookLeft</td>
+							<td>Handbrake + Radio</td>
+						</tr>
+						<tr class="feature">	
+							<th class="feature_detail_toggle"><a href="#" title="Show/Hide additional feature details" onclick="return toggle_feature_details('feat_tp');">Teleport - Load Location 2 (in vehicle)</a></th>
+							<td>Horn      + Shoot + MoveRight</td>
+							<td>Handbrake + LookRight</td>
+							<td>Handbrake + LookRight</td>
+							<td>Handbrake + LookRight</td>
+							<td class="disabled">(disabled)</td>
+						</tr>
+						<tr class="feature_detail" data-status="hidden" id="feat_tp">
+							<td colspan="6">
+								<ul>
+									<li>This feature allows you to save your current position/facing and subsequently teleport back to there at any time.</li>
+									<li>2 separate Teleport Locations can be saved.</li>
+									<li>Saving and Loading of Teleport Locations can be performed while the player is on-foot or in-vehicle.
+										When a Location is Loaded while in a vehicle, the vehicle, along with the player inside it, will be teleported.
+										When a Location is Loaded while on foot, the player will be teleported to the location and automatically placed in their prior vehicle
+										(subject to the associated Prior Vehicle Preference toggle), if it exists and is not destroyed, at that Location, otherwise they will be set there on-foot.</li>
+									<li>Note: When an on-foot Teleport Load takes place where the player is put inside a prior vehicle, the existing 'Replay' buffer will be cleared, meaning any
+										subsequent attempt to capture a Replay will only contain gameplay action which occurred after that point. 
+										If the 'Toggle Always cut replay on teleport load' feature is enabled, this will occur for ALL Teleport Loads - see details of that feature for more info.
+									</li>
+								</ul>
+							</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+					</table>
+					
+					<h3>Default Feature States</h3>
+					<table class="basic_table">
+						<tbody><tr>
+							<th>Feature</th>
+							<th>Default State</th>
+						</tr>
+						<tr>
+							<th>Player vulnerability</th>
+							<td>Invulnerable</td>
+						</tr>
+						<tr>
+							<th>Vehicle vulnerability</th>
+							<td>Invulnerable</td>
+						</tr>
+						<tr>
+							<th>'Ghost Town'</th>
+							<td>Off</td>
+						</tr>
+						<tr>
+							<th>Weather</th>
+							<td>Locked at 'Extra Sunny'</td>
+						</tr>
+						<tr>
+							<th>Time</th>
+							<td>Frozen at Midday</td>
+						</tr>
+						<tr>
+							<th>Wanted Level</th>
+							<td>0 Stars (Player Ignored by NPCs)</td>
+						</tr>
+						<tr>
+							<th>Prior vehicle preference</th>
+							<td>Last vehicle</td>
+						</tr>
+						<tr>
+							<th>Always cut replay on Teleport Load</th>
+							<td>No (occurs on foot-to-car teleports only)</td>
+						</tr>
+						<tr>
+							<th>Teleport Loads can restore lost vehicles</th>
+							<td>No</td>
+						</tr>
+						<tr>
+							<th>Stats Overlay</th>
+							<td>Off</td>
+						</tr>
+					</tbody></table>
+					
+					<h3>Automatic Features</h3>
+					<ul>
+						<li>Unlimited Player Health/Armour (includes not being decreased by Fire)</li>
+						<li>Unlimited Player Sprint</li>
+						<li>Player cannot be carjacked</li>
+						<li>Perfect Weapon Accuracy</li>
+						<li>Taxi Boost &amp; Nitro available (press Horn while driving for Boost/Jump)</li>
+						<li>"Unique Jump" slow-motion/camera removed</li>
+						<li>Various object pickups (rampages, hidden packages, etc) removed</li>
+					</ul>
+					
+					<h3>Benefitial control mappings:</h3>
+					<p>Note that all main variants attempt some degree of consistency between related USCM features, which may be further improved through in-game control mappings 
+						that map the same buttons to specific pairs of on-foot &amp; in-vehicle actions. These pairings are not necessary, but you may see benefits from any that work for you.</p>
+					<table class="basic_table">
+						<tr>
+							<th>On-Foot action</th>
+							<th>In-Vehicle action</th>
+							<th colspan="4">USCM Variants that benefit from matching buttons for this pair</th>
+						</tr>
+						<tr>
+							<td>Sprint</td><td>Horn</td>
+							
+							<td>Default</td>
+							<td>(Partial) Streamlined Default</td>
+							<td>(VC-style) Streamlined Default</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Jump</td><td>Handbrake</td>
+							
+							<td>&nbsp;</td>
+							<td>(Partial) Streamlined Default</td>
+							<td>(VC-style) Streamlined Default</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Crouch</td><td>Submission</td>
+							
+							<td>Default</td>
+							<td>(Partial) Streamlined Default</td>
+							<td>(VC-style) Streamlined Default</td>
+							<td>Streamlined Alternate</td>
+						</tr>
+						<tr>
+							<td>TalkNo</td><td>LookLeft</td>
+							
+							<td>&nbsp;</td>
+							<td>(Partial) Streamlined Default</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>TalkYes</td><td>LookRight</td>
+							
+							<td>&nbsp;</td>
+							<td>(Partial) Streamlined Default</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Action</td><td>LookLeft</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>(VC-style) Streamlined Default</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>LookBehind</td><td>LookRight</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>(VC-style) Streamlined Default</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Sprint</td><td>Handbrake</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>Streamlined Alternate</td>
+						</tr>
+						<tr>
+							<td>Jump</td><td>Horn</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>Streamlined Alternate</td>
+						</tr>
+						<tr>
+							<td>Aim</td><td>LookLeft</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>Streamlined Alternate</td>
+						</tr>
+						<tr>
+							<td>Action</td><td>LookRight</td>
+							
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td>Streamlined Alternate</td>
+						</tr>
+					</table>
+				</div>
+			</section>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group" id="changelog_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">5. Changelog</a></h2>
+				<div class="doc_group_content">
+					
+					<h3>Version 4c : April 2023</h3>
+					
+					<p><strong>New Features:</strong></p>
+					<ul>
+						<li>Toggle Offroad Wheels - install/remove these mod-shop wheels (which can have stunting benefits) on any supported vehicle</li>
+					</ul>
+					
+					<p><strong>Updated Features:</strong></p>
+					<ul>
+						<li>Trigger shot of NOS - no longer requires NOS to first be installed on the vehicle, as long as the vehicle <em>supports</em> having NOS (aka game would let you install it at a mod-shop if you tried), it will work
+							<br><em>(in fact it is now recommended to never properly install NOS, since this feature doesn't need it, and having it can cause issues - see the expanded details section of this feature for more info)</em></li>
+					</ul>
+					
+					<p><strong>Removed Features:</strong></p>
+					<ul>
+						<li>Toggle NOS installed on vehicle - (See above for why it should no longer be necessary/desired)</li>
+					</ul>
+					
+					<p><strong>Bug Fixes:</strong></p>
+					<ul>
+						<li>Stats Overlay - fixed an issue which meant this feature could cause the game to crash
+							<br>(if made a savegame while Mode 1/2/3 active and then attempted to load that savegame on first-opening the game or during gameplay with Mode 0/4 active)</li>
+					</ul>
+					
+					<h3>Version 4b : March 2023</h3>
+					
+					<h4>Features/Updates/Fixes new to this release</h4>
+					
+					<p><strong>Updated Features:</strong></p>
+					<ul>
+						<li>The Stats Overlay feature has been expanded, now there are multiple modes of display, supporting varying amounts of data and varying positions on the screen.<br>
+							Instead of an on/off toggle, triggering the feature will now cause it to cycle to its next mode:<br><br>
+							<table class="basic_table">
+								<tr>
+									<th>Mode</th><th>Display Status</th><th>Display Details</th><th>Display Position</th><th>Notes</th>
+								</tr>
+								<tr>
+									<th>Mode 0</th>
+									<td>Disabled</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+								<tr>
+									<th>Mode 1</th>
+									<td>Enabled</td>
+									<td>Everything</td>
+									<td>Split</td>
+									<td><em>(The equivalent of 'Enabled' in the prior official USCM releases)</em></td>
+								</tr>
+								<tr>
+									<th>Mode 2</th>
+									<td>Enabled</td>
+									<td>Everything</td>
+									<td>Sidebar</td>
+									<td>&nbsp;</td>
+								</tr>
+								<tr>
+									<th>Mode 3</th>
+									<td>Enabled</td>
+									<td>Speed-only</td>
+									<td>Middle</td>
+									<td><em>(The equivalent of 'Enabled' in the special 'Simple Stats Best' VC USCM release) (With thanks to Haywire)</em></td>
+								</tr>
+								<tr>
+									<th>Mode 4</th>
+									<td>Enabled</td>
+									<td>Speed-only</td>
+									<td>Bottom</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+							If triggered while using the last mode it will cycle back to the start (Mode 0, and thus be off/disabled), at which
+							point another triggering will enable it at Mode 1, and so on. Benefits of these new modes include the potential for more streamlined Stats (eg. if only want speed, you can do that now),
+							avoiding conflict with Insane Stunt Bonus (ISB) text display, and avoiding a text-flickering issue that can occur if have the Frame Limiter disabled.</li>
+					</ul>
+					
+					<p><strong>Map Support:</strong></p>
+					<ul>
+						<li>This is the first release of the SA USCM which also bundles together equivalent USCMs for some of San Andreas' map-mods: 'Alien City' and 'GTA United'.</li>
+					</ul>
+					
+					<h4>Features/Updates ported from SA-engined USCM (v4)</h4>
+					
+					<p><strong>Bug Fixes:</strong></p>
+					<ul>
+						<li>In-Car and Foot-to-Car Teleport Loads have reduced (hopefully eliminated) any chance at unintentionally maintaining some momentum from before the teleport
+							(previously this would lead to the location you were placed at not being the exact position/angle you had saved). In addition, no longer will a teleport load
+							triggered on a bike, immediately before a collision, cause the collision to still register and thus potentially only teleport you on-foot and not with the bike.</li>
+						<li>"Water Respawn" now has a fallback implementation for when it is used in map-mods without defined ped/vehicle paths.
+							When no paths are present (and thus this feature is otherwise unable to detect the nearest reasonable spot of land to place you on),
+							it instead will remove you from the vehicle and automatically activate Jetpack, so you can then fly out of the water.
+							<em>(This feature is less significant here compared to VC, as in the SA engine you can always manually exit your vehicle while it is underwater - VC requires specific USCM coding to support this)</em>.</li>
+						<li>A tank (Rhino) set as being "vulnerable" has always ensured that it remained "invulnerable" to explosions, as tanks are always meant to be.
+							However tanks are also supposed to always be "invulnerable" to bullets, so now (unlike previous releases) this "invulnerability" will also always be ensured.
+							(The impact of this bug in prior releases should've been relatively minimised by the fact that the tank has such strong health)</li>
+						<li>X &amp; Y coordinate values of the Stats Overlay will now correctly display the negative symbol for values between 0 and -1.</li>
+					</ul>
+					
+					<p><strong>Misc:</strong></p>
+					<ul>
+						<li>The "Limited" variant of the USCM has has been given some much-needed attention, significantly increasing the set of
+							USCM features that it supports (still not all of them). Most of the changes relate to new features being supported, 
+							rather than changing any existing features/controls/behaviour - the exceptions being the following:
+							<ul>
+								<li>Jetpack Forward movement is now performed by the standard method of on-foot forward movement, like all other variants.
+									No longer does this require its own special button combination. Hopefully the more natural approach will make it easy to get used to this change.</li>
+								<li>The few 'Default Feature States' where Limited had a different default to everyone else have all been changed to be
+									consistent across all variants now. Note that for those which have been affected, their corresponding feature for toggling
+									their state is included in the newly supported features for this variant, and thus their state can now be changed at-will during gameplay.</li>
+							</ul>
+							For a focused run-down of the changes specifically made to this variant, please see the included separate documentation
+							file: "Limited Variant Cheat Sheet".</li>
+					</ul>
+					
+					<h3>Version 4 : April 2021</h3>
+					
+					<h4>Brand New features / SA-specific changes</h4>
+					
+					<p><strong>New Features:</strong></p>
+					<ul>
+						<li>Bike Telport Snap-to-North - teleport positions with an angle close to north can be loaded to at perfect-north instead, while on a bike</li>
+						<li>Show last/2ndlast Vehicle - while on foot, have the camera leave and go aim-at/follow one of your prior vehicles</li>
+						<li>Always cut replay on teleport load - have any type of teleport load trigger a clearing of the replay buffer</li>
+						<li>Show Stats Overlay - include coordinate, angle, car speed, car health values on your HUD</li>
+					</ul>
+					
+					<p><strong>NOS and Hydraulics:</strong></p>
+					<ul>
+						<li>"Add NOS + Hyrdaulics"
+							<ul>
+								<li>Now split into two independant features. The NOS one uses the existing button comination, Hydraulics uses a new one.<br>
+									<em>Previously: Both were combined into one feature, thus you couldn't add one to your vehicle without the other as well</em></li>
+								<li>These features are now toggles, and thus the coresponding component can be added and removed from the current vehicle.<br>
+									<em>Previously: The feature only ever attempted to 'add' them to the vehicle, never 'remove' them</em></li>
+								<li>They will now also fully abide by each vehicle's proper support for such components, never adding them unless it is naturally supported in-game.<br>
+									<em>Previously: Only very basic checks were performed for 'support' before installing them, as such for many vehicles it did try to install them even when
+										the vehicles weren't supposed to support them, which is against the spirit of the USCM (sometimes it was okay, as the game ignored the request,
+										but other times it would indeed install them, then either letting them be used when they shouldn't, or having the vehicle go buggy/weird)</em></li>
+							</ul></li>
+						<li>"Trigger NOS" feature will now always work on a vehicle with NOS installed, regardless of how it was done
+							(whether it came that way, it was done via a garage/modshop, or was added by the coresponding USCM feature).<br>
+							<em>Previously: Only worked for taxis and vehicles where it was added by the USCM itself, and even then sometimes it wouldn't work as expected
+											(when doing stuff involving multiple vehicles, the USCM could 'forget' that it had installed NOS on a vehicle and thus couldn't trigger it here)</em></li>
+					</ul>
+
+					<p><strong>USCM Variants:</strong></p>
+					<ul>
+						<li>Now have TWO variations of the Streamlined Default (aka 'Dannye' from previous releases) variant.
+							The existing SA one was a mis-mash between following the same approach to the 'ideal keys' to the VC
+							one and also doing its own thing with different 'ideal keys', and thus wasn't as streamlined or consistent
+							as it perhaps could be. To try and produce a more consistent (internally, and with the VC USCM) and streamlined
+							variant, but without affect anyone who has used (and is thus familiar with) the 'Dannye' variant from previous SA USCM releases,
+							I have split the Streamlined Default variant into 2 - one more like what the coresponding varaint of the SA USCM has always been,
+							and one more like the corresponding variant of the VC USCM.</li>
+					</ul>
+					
+					<p><strong>Water Respawn:</strong></p>
+					<ul>
+						<li>In previous releases, the in-car Water Respawn feature could sometimes spawn your-vehicle upside-down and wedged into the ground.
+							This bug has been fixed. (Note it was only ever an issue in the SA-engine USCM)</li>
+					</ul>
+					
+					<h4>Updates to features ported from VC-engined USCM (v7)</h4>
+					
+					<p><strong>Vehicle Spawners:</strong></p>
+					<ul>
+						<li>The 6 additional sets of vehicle spawners have been modified to include vehicles appropriate for SA stunting, as best as I could determine.</li>
+						<li>Slight changes were made to the existing 2nd vehicle spawner for SA:
+							<ul>
+								<li>The Maverick was moved out and to the aircraft-specific set instead</li>
+								<li>The Caddie and DFT have been added</li>
+								<li>Extra bikes have been added, and all bikes are now in the front row of the vehicles</li>
+								<li>Other minor rearranging</li>
+							</ul></li>
+					</ul>
+					
+					<p><strong>Button Changes:</strong></p>
+					<ul>
+						<li>"Toggle last/2ndlast prior vehicle preference" has extra button in its combo:
+							<ul>
+								<li>Was: AIM + ACTION</li>
+								<li>Now: AIM + ACTION + LEFT</li>
+							</ul>
+							This was done so now there can be a group of 4 features that all use AIM + ACTION + &lt;direction&gt;, which should make them easier to become familiar with.</li>
+						<li>"Spawn Random Vehicle" has a button combo change for the Streamlined Alternate variant (which didn't previously exist for SA):
+							<ul>
+								<li>Was: SPRINT + FIRE + NEXTWEAP</li>
+								<li>Now: SPRINT + CROUCH</li>
+							</ul>
+							This was done to assist in being able to have the button combination for the new "Show last/2ndlast Vehicle" features have more similarity with the
+							"Take player to prior vehicle" and "Bring prior vehicle to player" features, which is something I was able to do already for the other variants.</li>
+					</ul>
+					
+					<h4>Ported from VC-engine USCM (v7)</h4>
+					
+					<p><strong>Button Changes:</strong></p>
+					<ul>
+						<li>Streamlined Default (aka 'Dannye' from previous releases) variants have swapped the button combos for 
+							the "Change Car Colours" and "Toggle Vehicle Vulnerability" features (so now, if you follow the 'ideal button pairings' for these variants,
+							the "Toggle Vehicle Vulnerability" and "Toggle Player Vulnerability" features should be assigned to the same buttons.
+							(It was never intentional to be how it used to be)
+						</li>
+					</ul>
+					
+					<p><strong>Source Code:</strong></p>
+					<ul>
+						<li>SIGNIFICANT overhaul with improved and simplified code, less repetition, consolidated areas of code dealing with triggering features from key detection,
+							nicer variable/label names, removed unnecessary variables/opcodes/logic, using 'gosubs' to make some code more modular, and improved comments
+							(and many more under-the-hood changes/improvements that wont be described below as they do not noticably affect the user experience)</li>
+						<li>Updated to Sanny Builder syntax (written using build 3.5.1), taking advantage of support for using TRUE/FALSE keywords to represent integers 1/0,
+							the ability for simpler 'if' statements ("if", "if and", "if or"), but still generally sticking to the classic opcode-focused syntax (not adopting any of its higher-level language constructs).</li>
+						<li>An added benefit of these improvements will hopefully be that it will be much easier to customise the USCM now for anyone interested in doing so.
+							Disabling a feature altogether, or changing the controls that trigger it, will be a simpler process (and could all be achieved through minor edits in an early area in the code).
+							For example, if you have previously used the 'Limited - aka (Old) Gamepad' variant of the USCM, and would prefer to stick with it, but wish it had more of the features available in it,
+							activating any of the disabled-by-default features in that USCM it should be as simple as uncommenting the trigger detection code (and deciding what ingame actions you would like to map to that trigger).</li>
+					</ul>
+
+					<p><strong>Saving/Loading:</strong></p>
+					<ul>
+						<li>Added new feature to save the game at any time (while on foot, and NOT on a mission).
+							(As a result of this, you can now even save while jetpacking, and when you load the game back later you will still be jetpacking)
+							(You should now also be able to save your game [and thus things like your teleport locations] when using a map-mod that doesn't have any other method of saving your game)</li>
+						<li>Ghostown status will now be properly remembered on save/load (previously the game would load as ghosttown disabled, regardless of status when saved,
+							potentially confusing the USCM code such that the next toggle would effectively do nothing)</li>
+						<li>Wanted Level feature will no longer be confused by a save/load (the latter automatically clearing the wanted level, yet previously the USCM code was
+							confused by this, affecting the behaviour of the next attempt to raise/lower the wanted level)</li>
+					</ul>
+
+					<p><strong>Interacting with a previous vehicle while on-foot (re: 'Teleport into Vehicle', 'Bring Car to Me', and 'Take Me to Car' features)</strong></p>
+					<ul>
+						<li>New feature to toggle WHICH previous vehicle these features should interract with, the player's previous vehicle or the one prior to that.</li>
+						<li>Removed a bug in the code which determines whether the vehicle is acceptable - it used to accept a vehicle that was both destroyed AND underwater, which it should never have done.</li>
+					</ul>
+
+					<p><strong>Vehicle Spawners:</strong></p>
+					<ul>
+						<li>Hopefully fixed/reduced the cases where not every vehicle in a set would spawn (seemed to relate to what direction the player was facing when triggering the spawner, especially east/west)</li>
+						<li>In addition to the existing 2 vehicle spawners, there are now 2 more.
+							<ul>
+								<li>(The 1st and 2nd vehicle sets are unchanged from previous USCM releases)</li>
+								<li>The 3rd vehicle set ('up') includes other fast cars that weren't covered by the original two spawners.</li>
+								<li>The 4th vehicle set ('down') includes offroad vehicles, gang-variant vehicles, and vehicles with a back tray.</li>
+							</ul></li>
+						<li>4 becomes 8: if activate a vehicle spawner while jetpacking, it will spawn a different set of vehicles...
+							<ul>
+								<li>The jetpack variant of the 1st set includes water vehicles (boats).</li>
+								<li>The jetpack variant of the 2nd set includes air vehicles (planes/helicopters).</li>
+								<li>The jetpack variant of the 3rd set includes service vehicles (police/ambulance/fire/etc).</li>
+								<li>The jetpack variant of the 4th set includes misc vehicles.</li>
+							</ul></li>
+						<li>Added a new feature 'Random Vehicle Spawner': activating this feature will spawn one random vehicle directly in front of the player.</li>
+					</ul>
+
+					<p><strong>Jetpack:</strong></p>
+					<ul>
+						<li>Can now activate ALL on-foot features while jetpacking.</li>
+						<li>Performing a foot-to-car Teleport Load while jetpacking (which couldn't be done previously) will automatically deactivate the jetpack.</li>
+					 	<li>To further reduce the unintended possibility of a player being able to have jetpack enabled while in a vehicle, I have added an extra trigger 
+							for disabling it - in addition to the usual control to turn on/off, also now the 'Enter Vehicle' button will deactivate an enabled jetpack.</li>
+						<li>Added new jetpack controls to support extra movements: strafe-left, strafe-right, move-back.</li>
+						<li>Added the ability to hold 'Sprint' while performing any jetpack movements to 'slow it down' (reduce the distance moved).</li>
+						<li>Can now move in multiple directions (along more than one axis) at a time (eg. forward-and-up, diagonally, etc)
+							(The player will also 'go faster' while doing this)</li>
+					</ul>
+					  
+					<p><strong>Water Respawn:</strong></p>
+					<ul>
+						<li>Can now activate the jetpack while the player is in/under-water on-foot, and as such I have removed the on-foot 'Water Respawn' feature (jetpacking out is much more convenient, and gives better control over where you go)</li>
+						<li>In fact ALL features (appropriate with the current status of the player as on-foot/in-vehicle) can now be performed while the player is in water</li>
+						<li>In-vehicle 'Water Respawn' feature still present, but I have changed the control for it (now that all other features are available while in water, you could accidentally trigger 'Water Respawn' when trying
+							to activate a different feature. The control for in-vehicle 'Water Respawn' is now 'Change Camera' - not ideal perhaps (you may want to press it a few more times afterwards to revert to your preferred camera
+							angle), but it wont clash with any other features - and its likely the feature wont be used too often as you can always use the Teleporting features to get out of the water as well (if have a location saved).</li>
+						<li>If you do perform a 'Water Respawn', the game's attempt at auto-selecting an on-ground coordinate to put you will hopefully now be more appropriate (based on vehicle paths, not character paths, since now the feature
+							is only performed while in a vehicle)</li>
+					</ul>
+
+					<p><strong>Weather + Time:</strong></p>
+					<ul>
+						<li>Toggling the weather change feature will now lock the weather at the next weather type in the (no longer random) sequence of in-game weather types.</li>
+						<li>It is now possible to disable locked weather, and return to letting the game control it naturally.
+							This will occur on the next toggle of the weather feature after the last locked-weather option, before restarting back at the first one.
+							However, the "natural game-controller weather" state is only available when time is UNFROZEN (to avoid strange game behaviour), and as such:
+							<ul>
+								<li>if enable frozen time while weather is not locked, we will automatically move on to having locked weather at the first in the sequence</li>
+								<li>if cycling through the weather types while time is frozen, we will skip over the game-controlled weather option, going straight from last-in-cyle to first-in-cycle.</li>
+							</ul></li>
+					</ul>
+
+					<p><strong>Wanted Levels:</strong></p>
+					<ul>
+						<li>To allow for significantly simpler code, I have removed the second of the two '0 stars' states in the Wanted Level feature.
+							"Zero stars (Ignored)" is still there as normal, as the lowest state you can be in, but previously there was an extra state between that and 1 Star called 'Zero starts (Not Ignored)'.
+							This has been removed. At any level after 0 you are treated as "not ignored" anyway, and there is always the possibility to raise/lower the	level as needed, so hopefully it is no loss.
+							(The only thing no longer possible now is to have the player able to be 'carjacked', which was only previously supported in that state I have removed, but hopefully stunters had no desire for that anyway).</li>
+						<li>No more text message display to say which wanted level you have set it to, when using this function, now the messages shown will only distinguish between 0 stars and some stars.
+							(This was also done to simplify the code - but again, if you want a specific level hopefully you will be showing the HUD to get a more accurate indication of your stars anyway, and thus no need for a message as well)</li>
+					</ul>
+
+					<p><strong>Input device/settings support + flexibility:</strong></p>
+					<ul>
+						<li>Previously, the variants of the USCM were each best-suited to particular controller input types/settings (keyboard-and-mouse vs gamepad devices, Standard vs Classic controls in the game options, etc).
+							Now ALL variants will do their best to support all such combinations of controller, and as such the decision about which variant of the USCM to use will hopefully come down to which in-game actions it
+							maps to the features provided, and how well you can make that work for you with the button mappings configured for your device of choice.
+							<ul>
+								<li>The main factor in achieving this is that now any feature triggers that relies on dection of forward/backward/strafeleft/straferight movement will ALWAYS be able to detect these actions regardless of whether
+									they are performed by a keyboard or a gamepad (different code was previously used for detecting each, and previous versions of the USCM only checked one such approach depending on which variant of the USCM it was).</li>
+							</ul></li>
+					</ul>
+					
+					<h4>Ported from VC-engine USCM (v6b)</h4>
+					
+					<p><strong>USCM Variants:</strong></p>
+					<ul>
+						<li>Brought across the "Streamlined Alternate" variant to the SA USCM - it started its life as the 'Gamepad B' variant in VC USCM v6b
+							(an attempt to provide a fully-featured variant for gamepad stunters), and as of v7 it is called "Streamlined Alternate"
+							(like all variants now I have removed the input-method-specific naming as the code is now more supportive of all input methods regardless of variant - see above).</li>
+					</ul>
+					
+				</div>
+			</section>
+
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">6. Known Issues / Quirks</a></h2>
+				<div class="doc_group_content">
+				
+					<h3>Issues</h3>
+					<ul class="chunky_list">
+						<li>Water Respawn, when used in a map-mod without any paths, doesn't take its "alternate" approach of triggering vehicle-exit + jetpack,
+							instead it just always teleports to the same random location every single time, no matter where on the map it was triggered from
+							<ul><li><em>workaround: the issue may be that the mod indeed doesn't have "working paths", but still has some non-working ones 
+													defined, and as such the USCM can only assume they are reliable (even if they are not) and try to use them
+													via the "primary" approach. If this is indeed the case, it is possible to edit your game files to ensure it
+													disregards these non-working paths, via editing your "gta_vc.dat" file and removing a line that mentions "paths.ipl"
+													(please make a backup of your file before doing this).</em></li></ul></li>
+						
+						<li>The Default variant uses ChangeCamera for jetpack activation AND as part of a combination to toggle Frozen Time
+							As a result, it is possible to accidentally activate/deactivate jetpack while trying to toggle Frozen Time
+							<ul><li><em>workaround: when pressing the buttons for the Frozen Time toggle, begin by holding the other button (Crouch) first</em></li>
+								<li><em>other approach: customise the scm to change the assigned actions of either feature</em></li></ul></li>
+
+						<li>While jetpacking, a feature that requires Crouch + Sprint (Ghost Town, in the Default variant; Frozen Time, 
+							in the Streamlined Default variants) would take priority over an attempt to 'go down, slowly', which also uses the 
+							same button combination. This is an issue a result of the recent addition to make all on-foot controls available
+							while jetpacking (as well as the addition of the 'slow' jetpacking mode).
+							<ul><li><em>workaround: dont try to 'go down, slowly', while jetpacking. sorry</em></li>
+								<li><em>other approach: customise the scm to change some/all of the conflicting actions required for the features</em></li></ul></li>
+
+						<li>Depending on the map-mod/total-conversion-mod the USCM code is used for, some of the cars spawned by the 
+						   Vehicle Spawner Set features, or the Spawn Random Vehicle feature, may not have been meant for use in that mod.
+						   Hopefully at least they wont break the game by their spawning, but that may be dependant on the mods in question.
+						   <ul><li><em>workaround: customise the scm to adjust vehicle spawns as necessary</em></li></ul></li>
+					</ul>
+					
+					<h3>Quirks (game-related, not USCM-specific)</h3>
+					<ul class="chunky_list">
+						<li>The "Conversation Yes" and "Conversation No" (referred to as Talk Yes/No elsewhere in this document) in-game actions have
+							a special behaviour that makes them differ from anything else: they are explicitly defined/customisable in the "On Foot" Controls menu,
+							and yet they can also be used (via those same assigned buttons) while the player is in a vehicle.<br><br>
+							This behaviour is loosely implied by the game for "Yes": when in the "In Vehicle" Controls menu, you will see an entry
+							for "Trip Skip" and it will share the exact same buttons you have mapped to "Yes" via the "On Foot" Controls menu. These two actions
+							thus have their assigned buttons completely synchronised - change one and you will see the other change along with it. There is no such
+							equivalent however for "No".<br><br>
+							As a result of this, not only are these two actions available (via the same mapped buttons) both while on-foot and in-vehicle, but also
+							it is possible to define another in-vehicle action to the same button(s) already assigned to these. Normally this sort of button conflict
+							is not allowed by the game, but it will accept it for these two actions. If you go ahead and assign a button to (for example) "Yes" and
+							some other in-vehicle action, then it is the case that pressing that button during gameplay will result in both actions triggering (and
+							doing so will count towards any triggers for USCM features that involve either of the actions).</li>
+						<li><em>(Keyboard users only, and possibly also dependant on hardware/driver/OS settings)</em><br>
+							If your control mapping leads to having a feature that requires pressing SHIFT and a Numpad-number-button at the same time, it is 
+							possible (again, this may not happen to everyone, but I have experienced it) that the game wont trigger the associated USCM feature
+							if both keys are pressed at the same time, nor if the SHIFT is pressed/held first, and rather it will only work if the Numpad-number-button
+							is pressed/held first. If experienced, it is possible that this can be rectified by having NumLock turned off, alternatively changing your
+							mappings such that a different button can be pressed in-place of one of them. (If the issue is indeed also related to hardware/driver/OS
+							then other such solutions may be available; though in my case despite the same USCM variant and control mappings, I only experience this
+							issue in San Andreas and not while playing Vice City).</li>
+					</ul>
+					
+				</div>
+			</section>
+			 
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">7. Modifying the USCM</a></h2>
+				<div class="doc_group_content">
+					
+					<h3>Modification Overview</h3>
+					<ul>
+						<li>Want to change the action/buttons used to activate a Feature to something more convenient for you?</li>
+						<li>Want to remove a Feature altogether because you don't need it and it just gets in the way?</li>
+						<li>Want to change/reverse the default state of a Feature?</li>
+						<li>Want the Vehicle Spawners to spawn different vehicles?</li>
+						<li>Want to use the USCM in a different San Andreas game-engine map-mod/total-conversion?</li>
+						<li>(etc)</li>
+					 </ul>
+					 <p>If you are willing to dive into a bit of "scm" coding, you can customise the USCM code to achieve any of these goals.
+						The source code for each USCM variant has been included in this package to attempt to assist this process.</p>
+					 
+					<h3>Source Code Introduction</h3>
+					<p>The source code provided in this package was written in the syntax of, and using the, "Sanny Builder 3.5.1" IDE.
+						It takes advantage of Sanny Builder's support for using TRUE/FALSE as keywords to represent integers 1/0 respectively, and
+						utilises some advantages offered by its "Conditions Check" option (simpler condition type definitions, eg "if and" and "if or",
+						but does not adopt its options for more advanced conditional logic), but otherwise sticks to a non-IDE-specific SCM syntax
+						as much as possible, which incorporates the "opcodes" on every line (thus keeping the "Write Opcodes" option checked, 
+						and not using some of the class-based alternatives for certain opcodes).</p>
+					<p>The source code should thus be compatible with Sanny Builder IDE, but may not necessarily be with any other SCM de/compilers 
+						available (eg. BW's Vice Mission Builder). However, the compiled "scm" files included in this package *will* be able to be 
+						decompiled into editable source code via any such program. In taking this approach you would lose the significant documentation
+						that is present in my included source code (comments, variable names, label names, etc), but all the important USCM logic/functionality
+						would still be present (and in that case, the nicer source code provided in this package could still be used for reference).</p>
+					 
+					<h3>Source Code Context</h3>
+					<p>The bundled source code does not include the raw source of the entire "scm" file, rather it includes only the extracted section of 
+						core USCM logic and functionality, which, in a complete main.scm file, is surrounded by other unrelated game/map-mod specific "scm" code.</p>
+					<p>The source code (which, not counting comments, begins with a label, followed by the '03A4: name_thread "ULTSCM"' line) generally resides in an "scm" file
+						just before the chunk of code for "Mission 0" (if present). The most important single line of code outside of this extracted source code is the one
+						which activates it - that is, a "004F: create_thread @ULTSCM" line (the label included in this line being the same one the USCM-specific code
+						begins with), which should reside early in the "scm" file in its "MAIN" code chunk (thread), usually among a number of other such lines located in that area of the file.</p>
+					<p>For more information regarding scm coding syntax and how to modify the USCM, please refer to any documentation included with the editor you decide to use,
+						and look at the comments provided in the source code provided - I have tried my best to ensure that it is as easy-to-follow/understand as possible,
+						including comments to explain many included behaviours/concepts.</p>
+					
+				</div>
+			</section>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2><a href="#" onclick="return toggle_section(this);" title="Show/Hide associated details">8. Credits/Acknowledgements</a></h2>
+				<div class="doc_group_content">
+				
+					<p>Mod created by: Dannye</p>
+					<p>With the support of: Kaneda, M3rrix, Nitzkit, .::bj070893::., Turtle Dick, Buzzsaw, Xtramus, Aries, Psycho, Rainbow, Kingjad, Haywire, Demo00n, Sheeptea, Ltab, Przemoo.</p>
+					<p>Thanks also to: <a href="https://www.gtastunting.net/index.php?action=forums" target="_blank">the GTAStunting.com forums</a> and all its members.
+						If you need any support/assistance for this mod please visit <a href="https://www.gtastunting.net/index.php?topic=9046" target="_blank">the associated thread</a> on that forum.</p>
+					<p>If you are going to redistribute a copy/customised-version of this mod, please consider including this documentation file (modified as necessary)
+						so users have the all necessary information to assist in using it.</p>
+					<p>This is the latest release of the mod as of: April 2023.</p>
+					
+				</div>
+			</section>
+			
+			<div class="jumplist">
+				<a href="#top" title="Return to top">Return to top</a>
+			</div>
+			
+		</div>
+	</body>
+</html>

@@ -1,0 +1,91 @@
+C L E O 3 / Die neue Mission Script-Technik für GTA San Andreas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+*CLEO 3 ermöglicht das Hinzufügen 
+von Funktionen und sogar Missionen zum Spiel
+ohne die Main.scm zu ändern
+----------
+*Vorhandene Savegames können problemlos geladen werden
+----------
+*Vorraussetzung ist die modifizierbare GTA-SA-Version
+GTASA-US-1.0 und 1.01 oder EU-1.0 und 1.01
+Dabei kommt es auf die gta_sa.exe an, mit der man sein Spiel betreibt.
+----------
+*Die Installation ist sehr einfach
+Man kopiert die CLEO 3-Basisdateien und den CLEO-Ordner
+ins GTA-SA_installationsverzeichnis
+----------
+*CLEO-Scriptmods, die auf GTA-Fanwebseiten angeboten werden,
+kann man dann als einzelne Datei zum Spiel hinzugefügen,
+indem sie im CLEO-Ordner abgelegt werden
+
+oder wieder entfernen indem man sie einfach in 
+einen anderen Ordner verschiebt oder ganz löscht
+
+
+----------
+
+----------
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// CLEO 3-Basisdateien  // 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Die CLEO 3-Basisdateien bestehen aus:
+ - cleo.asi
+ - vorbisFile.dll
+ - vorbisHooked.dll
+ - CLEO-Ordner für die Script-Mods
+----------
+Bei diesem CLEO 3-Basisdateien-Paket 
+ist ein Demoscript als Beispiel dabei,
+das im Spiel einen kurzen Text einblendet
+ - DEMOTESTTEXT.cs
+----------
+Dann ist noch ein GXT-Plugin dabei
+ - GXTHook.cleo
+ - CLEO_TEXT - Ordner
+Es ermöglicht den Scriptauthoren das Erstellen neuer GXT-Einträge,
+damit man neuen Text darstellen kann,
+ohne die german.gxt oder american.gxt ändern zu müssen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Die im GTA-SA schon vorhandene vorbisFile.dll wird ersetzt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+----------
+
+----------
+
+
+CLEO 3 wurde zum größten Teil von "Seemann" entwickelt, dem Author des Sannybuilders 
+(Editor für Main.scm und mission-coding / Nachfolge-tool des Missionbuilders von Bart Waterduck)
+Nur Seemanns Sannybuilder ermöglicht das Erstellen von CLEO-Scriptmods
+
+Seemann bietet auf seiner Webseite die originale CLEO 3 -Library an,
+die zusätzliche Plugins enthält, z.B. einen MP3 Player
+
+Außerdem bietet er auf seiner Homepage Support für die CLEO-Technik sowie für den Sannybuilder
+
+http://cleo.sannybuilder.com/
+http://sannybuilder.com/
+
+----------
+
+----------
+
+Eine besondere Rolle spielen die Dateien
+-vorbisFile.dll
+-vorbisHooked.dll
+
+Außer denen, die in Seemanns CLEO 3 -Library enthalten sind
+kann man sie sich auch von JernejL (Delfi) downloaden, 
+dem Author des ASI plugin loader
+http://www.gtatools.com/filedb/action.php?action=file&id=19
+
+
+-----------------------------------------------------------------------
+
+---------------------------------------------------------------------

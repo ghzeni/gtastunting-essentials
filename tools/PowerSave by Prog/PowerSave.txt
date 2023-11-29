@@ -1,0 +1,704 @@
+// This file was decompiled using SASCM.ini published by GTAG (http://gtag.gtagaming.com/opcode-database) on 6.14.2013
+{$CLEO .cs}
+
+//-------------MAIN---------------
+0000: NOP 
+thread 'NONAME' 
+
+:NONAME_13
+wait 100 
+if 
+   Player.Defined($PLAYER_CHAR)
+else_jump @NONAME_13 
+if 
+0ADC:   test_cheat "POWER" 
+else_jump @NONAME_13 
+jump @NONAME_60 
+
+:NONAME_60
+$5 = Marker.CreateIconAndSphere(38, 0.0, -999999.0, 23.0)
+$6 = Marker.CreateIconAndSphere(46, -999999.0, 0.0, 23.0)
+$7 = Marker.CreateIconAndSphere(34, 999999.0, 0.0, 23.0)
+00BA: show_text_styled GXT 'POWON' time 1000 style 7 
+wait 500 
+03F0: enable_text_draw 1 
+0ADF: add_dynamic_GXT_entry "LOAD" text "DIST: ~1~FT" 
+0ADF: add_dynamic_GXT_entry "NORTH" text "NORTH ~1~" 
+0ADF: add_dynamic_GXT_entry "WEST" text "WEST ~1~" 
+0ADF: add_dynamic_GXT_entry "SOUTH" text "SOUTH ~1~" 
+0ADF: add_dynamic_GXT_entry "EAST" text "EAST ~1~" 
+0ADF: add_dynamic_GXT_entry "NS" text "N/S ~1~" 
+0ADF: add_dynamic_GXT_entry "EW" text "E/W ~1~" 
+0ADF: add_dynamic_GXT_entry "TYREO" text "O" 
+0ADF: add_dynamic_GXT_entry "TYREX" text "X" 
+0AF2: 10@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF2: 20@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF2: 30@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Z" 
+0AF2: 40@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ANGLE" 
+0AF0: $4 = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "MODEL" 
+0AF0: 55@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR1" 
+0AF0: 65@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR2" 
+0AF0: 444@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+0AF0: 555@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+0AF0: 666@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+0AF0: 777@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+0AF0: 499@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+0AF0: 399@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+0AF2: 458@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+0@ = 0 
+322@ = 1 
+311@ = 0 
+wait 2000 
+jump @NONAME_889 
+
+:NONAME_889
+if 
+  444@ >= 7 
+else_jump @NONAME_945 
+0340: set_text_draw_RGBA 24 204 0 255 
+033E: set_draw_text_position 120.0 3.0 GXT "TYREO" 
+jump @NONAME_983 
+
+:NONAME_945
+0340: set_text_draw_RGBA 250 42 0 255 
+033E: set_draw_text_position 120.0 3.0 GXT "TYREX" 
+jump @NONAME_983 
+
+:NONAME_983
+if 
+  555@ >= 7 
+else_jump @NONAME_1039 
+0340: set_text_draw_RGBA 24 204 0 255 
+033E: set_draw_text_position 120.0 13.0 GXT "TYREO" 
+jump @NONAME_1077 
+
+:NONAME_1039
+0340: set_text_draw_RGBA 250 42 0 255 
+033E: set_draw_text_position 120.0 13.0 GXT "TYREX" 
+jump @NONAME_1077 
+
+:NONAME_1077
+if 
+  666@ >= 7 
+else_jump @NONAME_1133 
+0340: set_text_draw_RGBA 24 204 0 255 
+033E: set_draw_text_position 133.0 3.0 GXT "TYREO" 
+jump @NONAME_1171 
+
+:NONAME_1133
+0340: set_text_draw_RGBA 250 42 0 255 
+033E: set_draw_text_position 133.0 3.0 GXT "TYREX" 
+jump @NONAME_1171 
+
+:NONAME_1171
+if 
+  777@ >= 7 
+else_jump @NONAME_1227 
+0340: set_text_draw_RGBA 24 204 0 255 
+033E: set_draw_text_position 133.0 13.0 GXT "TYREO" 
+jump @NONAME_1265 
+
+:NONAME_1227
+0340: set_text_draw_RGBA 250 42 0 255 
+033E: set_draw_text_position 133.0 13.0 GXT "TYREX" 
+jump @NONAME_1265 
+
+:NONAME_1265
+if 
+  499@ == 0 
+else_jump @NONAME_1314 
+045A: draw_text_1number 6.0 3.0 GXT 'NS' number 499@ 
+jump @NONAME_1394 
+
+:NONAME_1314
+if 
+   not 499@ > 0 
+else_jump @NONAME_1363 
+045A: draw_text_1number 6.0 3.0 GXT 'SOUTH' number 499@ 
+jump @NONAME_1394 
+
+:NONAME_1363
+045A: draw_text_1number 6.0 3.0 GXT 'NORTH' number 499@ 
+jump @NONAME_1394 
+
+:NONAME_1394
+if 
+  399@ == 0 
+else_jump @NONAME_1443 
+045A: draw_text_1number 6.0 13.0 GXT 'EW' number 399@ 
+jump @NONAME_1523 
+
+:NONAME_1443
+if 
+   not 399@ > 0 
+else_jump @NONAME_1492 
+045A: draw_text_1number 6.0 13.0 GXT 'WEST' number 399@ 
+jump @NONAME_1523 
+
+:NONAME_1492
+045A: draw_text_1number 6.0 13.0 GXT 'EAST' number 399@ 
+jump @NONAME_1523 
+
+:NONAME_1523
+if 
+   Actor.Driving($PLAYER_ACTOR)
+else_jump @NONAME_1613 
+if 
+  322@ == 1 
+else_jump @NONAME_1613 
+if or
+   Actor.Driving($PLAYER_ACTOR)
+847A:   not actor $PLAYER_ACTOR driving_bike 
+84A7:   not actor $PLAYER_ACTOR driving_boat 
+84C8:   not actor $PLAYER_ACTOR driving_flying_vehicle 
+89AE:   not actor $PLAYER_ACTOR driving_train 
+else_jump @NONAME_1613 
+69@ = Actor.CurrentCar($PLAYER_ACTOR)
+0508: car 69@ close_all_doors 
+jump @NONAME_1613 
+
+:NONAME_1613
+wait 0 
+if or
+   not Actor.Driving($PLAYER_ACTOR)
+80E1:   not player 0 pressed_key 14 
+80E1:   not player 0 pressed_key 18 
+80E1:   not player 0 pressed_key 6 
+else_jump @NONAME_1680 
+if or
+   not Actor.Driving($PLAYER_ACTOR)
+80E1:   not player 0 pressed_key 8 
+else_jump @NONAME_6308 
+jump @NONAME_2284 
+
+:NONAME_1680
+wait 10 
+00BA: show_text_styled GXT 'SAVEE' time 1000 style 7 
+wait 10 
+701@ = Actor.CurrentCar($PLAYER_ACTOR)
+&43833 = Car.Model(701@)
+Car.StorePos(701@, 10@, 20@, 30@)
+89@ = Car.Angle(701@)
+03F3: get_car 701@ primary_color_to 55@ secondary_color_to 65@ 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF3: write_float 30@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Z" 
+0AF3: write_float 89@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ANGLE" 
+0AF1: write_int &43833 to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "MODEL" 
+0AF1: write_int 55@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR1" 
+0AF1: write_int 65@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR2" 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINX" 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINY" 
+0AF3: write_float 30@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINZ" 
+0AF3: write_float 89@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINA" 
+499@ = 0 
+399@ = 0 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+wait 500 
+jump @NONAME_1314 
+
+:NONAME_2284
+if or
+   Actor.Driving($PLAYER_ACTOR)
+80E1:   not player 0 pressed_key 4 
+else_jump @NONAME_6308 
+jump @NONAME_2313 
+
+:NONAME_2313
+if 
+0ADC:   test_cheat "]" 
+else_jump @NONAME_2575 
+jump @NONAME_2336 
+
+:NONAME_2336
+if 
+80E1:   not player 0 pressed_key 17 
+else_jump @NONAME_2464 
+00BA: show_text_styled GXT 'EASTT' time 1000 style 7 
+399@ += 1 
+10@ += 0.1 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+jump @NONAME_6335 
+
+:NONAME_2464
+00BA: show_text_styled GXT 'EEAST' time 1000 style 7 
+399@ += 10 
+10@ += 1.0 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+jump @NONAME_6335 
+
+:NONAME_2575
+if 
+0ADC:   test_cheat "[" 
+else_jump @NONAME_2837 
+jump @NONAME_2598 
+
+:NONAME_2598
+if 
+80E1:   not player 0 pressed_key 17 
+else_jump @NONAME_2726 
+00BA: show_text_styled GXT 'WESTT' time 1000 style 7 
+399@ -= 1 
+10@ -= 0.1 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+jump @NONAME_6335 
+
+:NONAME_2726
+00BA: show_text_styled GXT 'WWEST' time 1000 style 7 
+399@ -= 10 
+10@ -= 1.0 
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+jump @NONAME_6335 
+
+:NONAME_2837
+if 
+0ADC:   test_cheat "/" 
+else_jump @NONAME_2969 
+jump @NONAME_2860 
+
+:NONAME_2860
+00BA: show_text_styled GXT 'ORIGIN' time 1000 style 7 
+399@ = 0 
+499@ = 0 
+0AF1: write_int 399@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+jump @NONAME_7031 
+
+:NONAME_2969
+if 
+0ADC:   test_cheat "`" 
+else_jump @NONAME_3068 
+jump @NONAME_2992 
+
+:NONAME_2992
+wait 10 
+00BA: show_text_styled GXT 'ANGLE' time 1000 style 7 
+89@ += 90.0 
+0AF3: write_float 89@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ANGLE" 
+jump @NONAME_6335 
+
+:NONAME_3068
+if 
+0ADC:   test_cheat "NOTYRE" 
+else_jump @NONAME_3323 
+jump @NONAME_3096 
+
+:NONAME_3096
+00BA: show_text_styled GXT 'NOTYRE' time 1000 style 7 
+444@ = 8 
+555@ = 8 
+666@ = 8 
+777@ = 8 
+0AF1: write_int 444@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+0AF1: write_int 555@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+0AF1: write_int 666@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+0AF1: write_int 777@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+jump @NONAME_6335 
+
+:NONAME_3323
+if 
+0ADC:   test_cheat "ATYRE" 
+else_jump @NONAME_3350 
+jump @NONAME_6081 
+
+:NONAME_3350
+if 
+0ADC:   test_cheat "=" 
+else_jump @NONAME_3612 
+jump @NONAME_3373 
+
+:NONAME_3373
+if 
+80E1:   not player 0 pressed_key 17 
+else_jump @NONAME_3501 
+00BA: show_text_styled GXT 'SOUTHH' time 1000 style 7 
+499@ -= 1 
+20@ -= 0.1 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+jump @NONAME_6335 
+
+:NONAME_3501
+00BA: show_text_styled GXT 'SSOUTH' time 1000 style 7 
+499@ -= 10 
+20@ -= 1.0 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+jump @NONAME_6335 
+
+:NONAME_3612
+if 
+0ADC:   test_cheat "-" 
+else_jump @NONAME_3635 
+jump @NONAME_5842 
+
+:NONAME_3635
+if 
+0ADC:   test_cheat "POWER" 
+else_jump @NONAME_3701 
+wait 100 
+00BA: show_text_styled GXT 'POWOFF' time 1000 style 7 
+Marker.Disable($5)
+Marker.Disable($7)
+Marker.Disable($6)
+wait 100 
+jump @NONAME_13 
+
+:NONAME_3701
+if 
+0ADC:   test_cheat "." 
+else_jump @NONAME_3754 
+if 
+  0@ == 0 
+else_jump @NONAME_5550 
+08DA: remove_panel 0@ 
+0@ = 1 
+jump @NONAME_889 
+
+:NONAME_3754
+if 
+0ADC:   test_cheat "FLTYRE" 
+else_jump @NONAME_3925 
+00BA: show_text_styled GXT 'FLTYRE' time 1000 style 7 
+if 
+  444@ == 8 
+else_jump @NONAME_3867 
+444@ = 0 
+0AF1: write_int 444@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+jump @NONAME_6335 
+
+:NONAME_3867
+444@ = 8 
+0AF1: write_int 444@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+jump @NONAME_6335 
+
+:NONAME_3925
+if 
+0ADC:   test_cheat "BLTYRE" 
+else_jump @NONAME_4096 
+00BA: show_text_styled GXT 'BLTYRE' time 1000 style 7 
+if 
+  555@ == 8 
+else_jump @NONAME_4038 
+555@ = 1 
+0AF1: write_int 555@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+jump @NONAME_6335 
+
+:NONAME_4038
+555@ = 8 
+0AF1: write_int 555@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+jump @NONAME_6335 
+
+:NONAME_4096
+if 
+0ADC:   test_cheat "FRTYRE" 
+else_jump @NONAME_4267 
+00BA: show_text_styled GXT 'FRTYRE' time 1000 style 7 
+if 
+  666@ == 8 
+else_jump @NONAME_4209 
+666@ = 2 
+0AF1: write_int 666@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+jump @NONAME_6335 
+
+:NONAME_4209
+666@ = 8 
+0AF1: write_int 666@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+jump @NONAME_6335 
+
+:NONAME_4267
+if 
+0ADC:   test_cheat "BRTYRE" 
+else_jump @NONAME_4438 
+00BA: show_text_styled GXT 'BRTYRE' time 1000 style 7 
+if 
+  777@ == 8 
+else_jump @NONAME_4380 
+777@ = 3 
+0AF1: write_int 777@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+jump @NONAME_6335 
+
+:NONAME_4380
+777@ = 8 
+0AF1: write_int 777@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+jump @NONAME_6335 
+
+:NONAME_4438
+if 
+0ADC:   test_cheat "DOOR" 
+else_jump @NONAME_4464 
+jump @NONAME_5464 
+
+:NONAME_4464
+if 
+0ADC:   test_cheat "AUTO" 
+else_jump @NONAME_4576 
+jump @NONAME_4490 
+
+:NONAME_4490
+if 
+  311@ == 1 
+else_jump @NONAME_4542 
+00BA: show_text_styled GXT 'AUTOFF' time 1000 style 7 
+311@ -= 1 
+wait 100 
+jump @NONAME_889 
+
+:NONAME_4542
+00BA: show_text_styled GXT 'AUTON' time 1000 style 7 
+311@ += 1 
+wait 100 
+jump @NONAME_6335 
+
+:NONAME_4576
+if 
+  311@ == 1 
+else_jump @NONAME_889 
+if 
+0ADC:   test_cheat "EDIT" 
+else_jump @NONAME_5194 
+jump @NONAME_4620 
+
+:NONAME_4620
+08D4: 753@ = create_panel_with_title 'DUMMY' position 25.0 150.0 width 160.0 columns 1 interactive 1 background 1 alignment 0 
+08DB: set_panel 753@ column 0 header 'EDIT' data 'DUMMY' 'DUMMY' 'PLUS' 'DUMMY' 'DUMMY' 'MOIN' 'DUMMY' 'DUMMY' 'EXIT' 'DUMMY' 'DUMMY' 'DUMMY' 
+jump @NONAME_4788 
+
+:NONAME_4788
+0AF0: 460@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+460@ *= 3.34 
+045A: draw_text_1number 165.0 3.0 GXT 'LOAD' number 460@ 
+if 
+00E1:   player 0 pressed_key 15 
+else_jump @NONAME_4892 
+08DA: remove_panel 753@ 
+wait 100 
+jump @NONAME_889 
+
+:NONAME_4892
+wait 0 
+if 
+00E1:   player 0 pressed_key 16 
+else_jump @NONAME_4788 
+08D7: 9@ = panel 753@ active_row 
+if 
+  9@ == 2 
+else_jump @NONAME_4946 
+jump @NONAME_4996 
+
+:NONAME_4946
+if 
+  9@ == 5 
+else_jump @NONAME_4971 
+jump @NONAME_5087 
+
+:NONAME_4971
+if 
+  9@ == 8 
+else_jump @NONAME_4788 
+jump @NONAME_5178 
+
+:NONAME_4996
+0AF2: 460@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+460@ += 2.0 
+0AF3: write_float 460@ to_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+jump @NONAME_4788 
+
+:NONAME_5087
+0AF2: 460@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+460@ -= 2.0 
+0AF3: write_float 460@ to_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+jump @NONAME_4788 
+
+:NONAME_5178
+08DA: remove_panel 753@ 
+wait 100 
+jump @NONAME_889 
+
+:NONAME_5194
+0AF2: 458@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+0AF2: 459@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+0AF0: 460@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "LOAD" key "DIST" 
+459@ += 5.0 
+460@ *= 3.34 
+045A: draw_text_1number 165.0 3.0 GXT 'LOAD' number 460@ 
+if 
+80FE:   not actor $PLAYER_ACTOR sphere 0 in_sphere 10@ 20@ 30@ radius 458@ 458@ 458@ 
+else_jump @NONAME_889 
+80FE:   not actor $PLAYER_ACTOR sphere 0 in_sphere 10@ 20@ 30@ radius 459@ 459@ 459@ 
+else_jump @NONAME_5424 
+jump @NONAME_889 
+
+:NONAME_5424
+Car.StorePos(70@, 17@, 18@, 19@)
+if 
+0038:   19@ == 30@  // Note: the incorrect math opcode was used here
+else_jump @NONAME_6335 
+jump @NONAME_889 
+
+:NONAME_5464
+if 
+  322@ == 1 
+else_jump @NONAME_5516 
+00BA: show_text_styled GXT 'CLOFF' time 1000 style 7 
+322@ -= 1 
+wait 100 
+jump @NONAME_889 
+
+:NONAME_5516
+00BA: show_text_styled GXT 'CLON' time 1000 style 7 
+322@ += 1 
+wait 100 
+jump @NONAME_889 
+
+:NONAME_5550
+08D4: 0@ = create_panel_with_title 'DUMMY' position 30.0 110.0 width 280.0 columns 2 interactive 0 background 1 alignment 1 
+08DB: set_panel 0@ column 0 header 'COM' data 'HELP1' 'HELP2' 'DUMMY' 'HELP0' 'HELP3' 'HELP4' 'HELP5' 'HELP6' 'DUMMY' 'HELP7' 'HELP8' 'DUMMY'  // Commerce
+08DB: set_panel 0@ column 1 header 'BON' data 'HELP15' 'HELP16' 'HELP17' 'DUMMY' 'HELP9' 'HELP10' 'DUMMY' 'HELP11' 'HELP13' 'HELP12' 'HELP14' 'DUMMY' 
+jump @NONAME_889 
+
+:NONAME_5842
+if 
+80E1:   not player 0 pressed_key 17 
+else_jump @NONAME_5970 
+00BA: show_text_styled GXT 'NORTHH' time 1000 style 7 
+499@ += 1 
+20@ += 0.1 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+jump @NONAME_6335 
+
+:NONAME_5970
+00BA: show_text_styled GXT 'NNORTH' time 1000 style 7 
+499@ += 10 
+20@ += 1.0 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF1: write_int 499@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+jump @NONAME_6335 
+
+:NONAME_6081
+00BA: show_text_styled GXT 'ATYRE' time 1000 style 7 
+444@ = 0 
+555@ = 1 
+666@ = 2 
+777@ = 3 
+0AF1: write_int 444@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+0AF1: write_int 555@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+0AF1: write_int 666@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+0AF1: write_int 777@ to_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+jump @NONAME_6335 
+
+:NONAME_6308
+wait 100 
+00BA: show_text_styled GXT 'LOADD' time 500 style 7 
+jump @NONAME_6335 
+
+:NONAME_6335
+wait 10 
+if 
+   Model.Available($4)
+else_jump @NONAME_6371 
+wait 10 
+Car.Destroy(70@)
+jump @NONAME_6371 
+
+:NONAME_6371
+0AF0: $4 = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "MODEL" 
+wait 10 
+Model.Load($4)
+038B: load_requested_models 
+wait 10 
+0AF2: 10@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF2: 20@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF2: 30@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Z" 
+0AF2: 89@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ANGLE" 
+0AF0: 55@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR1" 
+0AF0: 65@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR2" 
+0AF0: 444@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+0AF0: 555@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+0AF0: 666@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+0AF0: 777@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+0AF0: 499@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "NS" 
+0AF0: 399@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "EW" 
+70@ = Car.Create($4, 10@, 20@, 30@)
+Car.SetImmunities(70@, 1, 1, 1, 1, 1)
+0229: set_car 70@ primary_color_to 55@ secondary_color_to 65@ 
+Car.Angle(70@) = 89@
+04FE: deflate_tire 444@ on_car 70@ 
+04FE: deflate_tire 555@ on_car 70@ 
+04FE: deflate_tire 666@ on_car 70@ 
+04FE: deflate_tire 777@ on_car 70@ 
+wait 50 
+Car.PutAt(70@, 10@, 20@, 30@)
+Car.Angle(70@) = 89@
+Car.DoorStatus(70@) = 1
+wait 250 
+jump @NONAME_1314 
+
+:NONAME_7031
+wait 10 
+if 
+   Model.Available($4)
+else_jump @NONAME_7067 
+wait 10 
+Car.Destroy(70@)
+jump @NONAME_7067 
+
+:NONAME_7067
+0AF0: $4 = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "MODEL" 
+wait 10 
+Model.Load($4)
+038B: load_requested_models 
+wait 10 
+0AF2: 10@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINX" 
+0AF2: 20@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINY" 
+0AF2: 30@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINZ" 
+0AF2: 89@ = get_float_from_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ORIGINA" 
+0AF0: 55@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR1" 
+0AF0: 65@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "COLOR2" 
+0AF0: 444@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE1" 
+0AF0: 555@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE2" 
+0AF0: 666@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE3" 
+0AF0: 777@ = get_int_from_ini_file "CLEO\POWERSAVE.TXT" section "VEHICLE" key "POPTIRE4" 
+70@ = Car.Create($4, 10@, 20@, 30@)
+Car.SetImmunities(70@, 1, 1, 1, 1, 1)
+0229: set_car 70@ primary_color_to 55@ secondary_color_to 65@ 
+Car.Angle(70@) = 89@
+04FE: deflate_tire 444@ on_car 70@ 
+04FE: deflate_tire 555@ on_car 70@ 
+04FE: deflate_tire 666@ on_car 70@ 
+04FE: deflate_tire 777@ on_car 70@ 
+wait 50 
+Car.PutAt(70@, 10@, 20@, 30@)
+Car.Angle(70@) = 89@
+Car.DoorStatus(70@) = 1
+0AF3: write_float 10@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "X" 
+0AF3: write_float 20@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Y" 
+0AF3: write_float 30@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "Z" 
+0AF3: write_float 89@ to_ini_file "CLEO\POWERSAVE.TXT" section "COORD" key "ANGLE" 
+wait 250 
+jump @NONAME_1314 
+[COORD]
+EW=0
+NS=0
+X=1814.5
+Y=1481.01
+Z=7.4414
+ANGLE=194.819
+ORIGINX=1814.5
+ORIGINY=1481.01
+ORIGINZ=7.4414
+ORIGINA=194.819
+[VEHICLE]
+MODEL=443
+COLOR1=20
+COLOR2=1
+POPTIRE2=1
+POPTIRE4=3
+POPTIRE3=8
+POPTIRE1=8

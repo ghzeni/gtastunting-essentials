@@ -1,0 +1,54 @@
+POWON POWERSAVE ON
+POWOFF POWERSAVE OFF
+SAVEE SAVE
+LOADD LOAD
+ORIGIN ORIGIN
+SOUTHH SOUTH + 1
+SSOUTH SOUTH + 10
+NORTHH NORTH + 1
+NNORTH NORTH + 10
+EASTT EAST + 1
+EEAST EAST + 10
+WESTT WEST + 1
+WWEST WEST + 10
+ANGLE ANGLE +90
+ATYRE ALL POPTYRES
+NOTYRE NO POPTYRE
+
+FTYRE 2 LEFT TIRES
+BTYRE 2 BACK TYRES
+BLTYRE BACK LEFT TYRE
+BRTYRE BACK RIGHT TYRE
+FRTYRE FRONT RIGHT TYRE
+FLTYRE FRONT LEFT TYRE
+
+CLON AUTO CLOSE CAR DOORS ON
+CLOFF AUTO CLOSE CAR DOORS OFF
+AUTON AUTO LOAD ON
+AUTOFF AUTO LOAD OFF
+
+HELP HELP
+HELP1 Save : Brake + Handbrake + Horn (in car)
+HELP2 Load : Next Radio (car) or Action (foot)
+HELP0    --- Press Fire + Key for +10 ---
+HELP3 North  +1  :   -
+HELP4 South  +1  :   =
+HELP5 East    +1  :   [
+HELP6 West   +1  :   ]
+HELP7 Angle +90 :    `
+HELP8 Origin.     :   /
+HELP9      No poptyre		: notyre
+HELP10      All poptyres	 : atyre
+HELP11      Front Right Tyre	 : frtyre
+HELP12      Front Left Tyre	  : fltyre
+HELP13      Back Right Tyre	  : brtyre
+HELP14      Back Left Tyre	   : bltyre
+HELP15      Autoclose Car Doors    : door
+HELP16      Auto Load            : load
+HELP17       Auto Load Distance Editor : edit
+COM COMMANDS
+BON      OPTIONS
+EDIT AUTOLOAD EDITOR
+PLUS + 30ft
+MOIN - 30ft
+EXIT EXIT

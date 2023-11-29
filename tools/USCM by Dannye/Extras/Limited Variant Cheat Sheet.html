@@ -1,0 +1,408 @@
+<html>
+	<head>
+		<title>USCM v4c - Legacy/Limited Variant Controls Cheat Sheet</title>
+		<style>
+			body { background: #e5e5e5; color: #111; }
+			.page { max-width: 80%; margin: 3em auto; padding: 2em; background: #fafafa; border: 1px solid #ccc; }
+			h1, h2, h3, h4 { font-family: 'Trebuchet MS', Verdana, Aria, sans-serif; }
+			h1 { font-size: 1.5em; text-align: center; } .page h1:first-child { margin-top: 0; }
+			h2 { font-size: 1.2em; background: #0f1a35; padding: 5px; color: #fff; }
+			h3 { font-size: 0.85em; background: #c4ccdf; padding: 2px; }
+			h4 { font-size: 0.85em; border-bottom: 2px solid #c4ccdf; padding: 2px; }
+			p, h3, h4 { margin: 0 0 1em 0; }
+			th { text-align: left; }
+			.basic_table, .features_table { border-top: 1px solid #ccc; border-left: 1px solid #ccc; border-collapse: collapse; margin-bottom: 1em; }
+			.basic_table th, .basic_table td, .features_table th, .features_table td { padding: 5px; border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; vertical-align: top; }
+			/*.basic_table td { border-left: 1px solid #ccc; }*/
+			.basic_table tr:nth-child(even) > th, .basic_table tr:nth-child(even) > td { background: #eee; }
+			a { color: inherit; }
+			h2 a { text-decoration: none; display: block; position: relative; } h2 a:hover { text-decoration: underline; }
+			h2 a:after { content: '(show/hide)'; position: absolute; right: 0; padding: 0 5px; font-size: 0.6em; }
+			.features_table { width: 100%; }
+		/*	.features_table tr.feature td { display: none; }*/
+			.features_table tr.even > th, .features_table tr.even > td { background: #eee; }
+			.features_table .variant_selectors { display: inline-block; font-weight: normal; vertical-align: top; margin-left: 1em; }
+			.features_table .variant_selectors label { margin-right: 1em; display: inline-block; }
+		/*	.features_table[data-show_variant1=t] tr.feature td:nth-of-type(1) { display: table-cell; }
+			.features_table[data-show_variant2=t] tr.feature td:nth-of-type(2) { display: table-cell; }
+			.features_table[data-show_variant3=t] tr.feature td:nth-of-type(3) { display: table-cell; }
+			.features_table[data-show_variant4=t] tr.feature td:nth-of-type(4) { display: table-cell; }
+		*/	.chunky_list > li { margin-bottom: 1em; }
+		</style>
+		<script type="text/javascript">
+			function toggle_section(section_heading_link)
+			{
+				var section_content = section_heading_link.parentNode.parentNode.children[1];
+				section_content.style.display = (section_content.style.display !== 'none') ? 'none' : 'block';
+				return false;
+			}
+		</script>
+	</head>
+	<body>
+		<div class="page">
+			<h1>Overview of Controls/Changes specifically made to the "Legacy/Limited variant" in v4c</h1>
+			
+			<p>This variant has always supported only a small subset of the complete USCM feature set,
+				however with this release the functionality of this variant has finally been fleshed out a bit.</p>
+			<p>Note: The name of this variant has been renamed (again) slightly to just "Limited" for this release.</p>
+			
+			<table class="basic_table">
+				<tr>
+					<td class="leg_new">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+					<td>New feature support</td>
+				</tr>
+				<tr>
+					<td class="leg_diff">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+					<td>Existing feature changed</td>
+				</tr>
+			</table>
+			
+			<!-- --------------------------------------------------------------------------------------------------------------------------- -->
+			<section class="doc_group">
+				<h2>Feature Controls</h2>
+				<div class="doc_group_content">
+					<style>
+						.feature_detail_toggle { display: block; text-decoration: none; }
+						.feature_detail_toggle:hover { background: #c4ccdf; }
+						.feature_detail td { display: none; }
+						.feature_detail[data-status=shown] td { display: table-cell; }
+						.features_table tr.leg_new > td, .features_table tr.leg_new > th, .basic_table tr td.leg_new, .basic_table tr th.leg_new, ul li span.leg_new { background: #e1b35e; }
+						.features_table tr.leg_diff > td, .features_table tr.leg_diff > th, .basic_table tr td.leg_diff, .basic_table tr th.leg_diff, ul li span.leg_diff { background: #bd7373; }
+						.disabled { color: #6a6a6a; font-style: italic; }
+					</style>
+					
+					<p>With all the newly added/supported features, for their button combinations I've tried to get the right mix of being easy enough to
+					   trigger intentionally (with elements of consistency with other/existing features to assist here), while also being out-of-the-way 
+					   enough to hopefully be able to ignore/forget-about them when unneeded and never worry about accidentally triggering them during 
+					   normal stunting behaviour or when trying to interact with other scm features. That many of the additions also belong to features 
+					   that likely don't see frequent (or at least certainly not urgent-on-the-fly) usage, will hopefully also help in these regards.</p>
+					
+					<table class="features_table" id="features_table">
+						<tr class="feature even">
+							<th>Feature</th>
+							<th>Controls</th>
+							<th>Notes on Changes/Additions</th>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">
+							<th>Vehicle Spawner Set 1a/b</th>
+							<td>EnterVehicle + PrevWeapon</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Vehicle Spawner Set 2a/b</th>
+							<td>EnterVehicle + NextWeapon</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Vehicle Spawner Set 3a/b</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Vehicle Spawner Set 4a/b</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Spawn random vehicle</th>
+							<td>PrevWeapon + NextWeapon</td>
+							<td>(a combo of the secondary buttons used by Spawner 1 + 2 above)</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>'Remember' current vehicle</th>
+							<td>Horn + Submission</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th>Flip current car back onto wheels</th>
+							<td>LookLeft + LookRight</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th>Bring prior vehicle to player</th>
+							<td>LookBehind</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Take player to prior vehicle</th>
+							<td>EnterVehicle + Shoot</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Show last-used vehicle</th>
+							<td>EnterVehicle + Action</td>
+							<td>(a slight consistency with 'Take to vehicle' above, its closest relative - this doing similar except moving just the camera, not the player)</td>
+						</tr>
+						<tr class="feature">	
+							<th>Show 2nd-last-used vehicle</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Toggle last/2ndlast prior vehicle preference</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Cycle Stats Overlay Mode</th>
+							<td>Aim + Action + MoveForward</td>
+							<td rowspan="5">(part of a set of related 3 button combos: the 2 triggers plus a thumb-accessible direction/button)</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Toggle Always cut replay on teleport load</th>
+							<td>Aim + Action + MoveBackward</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even leg_new">	
+							<th>Set/Clear Weather</th>
+							<td>Aim + Action + MoveLeft</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Toggle Frozen Time</th>
+							<td>Aim + Action + MoveRight</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature leg_new">	
+							<th>Initiate Save Game screen/prompt</th>
+							<td>Aim + Action + Sprint</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Toggle Bike Teleport Snap-to-North</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th>Toggle 'Ghost Town'</th>
+							<td>Crouch</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Toggle player vulnerability</th>
+							<td>ChangeCamera</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even leg_new">	
+							<th>Toggle current/future vehicle vulnerability</th>
+							<td>ChangeCamera + Submission</td>
+							<td>(utilises ChangeCamera for some consistency with its corresponding on-foot feature: Player Vulnerability)<br>
+								(however, in-car this button does affect camera mode, hence a 2 button combo - so can still change/revert camera mode without re/triggering this toggle)</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">
+							<th>Change current vehicle colours</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th>Place in/underwater current vehicle on land</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Jetpack - Enable</th>
+							<td>Aim + EnterVehicle</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Jetpack - Disable</th>
+							<td>EnterVehicle</td>
+							<td></td>
+						</tr>
+						<tr class="feature leg_diff">	
+							<th>Jetpack - Forward</th>
+							<td>Joystick-Up</td>
+							<td>(same as normal on-foot forward movement, so hopefully will quickly feel natural despite being a change from previous releases)</td>
+						</tr>
+						<tr class="feature leg_new">	
+							<th>Jetpack - Backward</th>
+							<td>Joystick-Down</td>
+							<td>(with forward now done via UP, figured may as well also support backwards on DOWN)</td>
+						</tr>
+						<tr class="feature">	
+							<th>Jetpack - Turn</th>
+							<td>Joystick-Left/Right</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Jetpack - Strafe</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Jetpack - Up</th>
+							<td>Aim + PrevWeapon</td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Jetpack - Down</th>
+							<td>Aim + NextWeapon</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even leg_new">
+							<th>Wanted Level - Decrease/Clear</th>
+							<td>Action + PrevWeapon</td>
+							<td rowspan="2">(while nothing to do with Jetpack Up/Down, there's a bit of familiarity here)<br>
+											(that is, opposite bumpers for opposite behaviours, now just while holding down the other trigger)</td>
+						</tr>
+						<tr class="feature even leg_new">
+							<th>Wanted Level - Increase</th>
+							<td>Action + NextWeapon</td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature">	
+							<th>Toggle Hydraulics installed on vehicle</th>
+							<td><abbr title="Configured only via 'On Foot' controls in-game, but also works while in vehicle">TalkNo</abbr></td>
+							<td></td>
+						</tr>
+						<tr class="feature">	
+							<th>Toggle Offroad Wheels installed on vehicle</th>
+							<td><abbr title="This 'On Foot' (Talk Yes) and 'In Vehicle' (Trip Skip) control are one and the same, sharing the buttons assigned to them">TalkYes/TripSkip</abbr></td>
+							<td>(note that this new feature is replacing [thus using the same controls of] the old "Toggle NOS installed on vehicle" feature)</td>
+						</tr>
+						<tr class="feature">	
+							<th>Trigger shot of NOS</th>
+							<td>Secondary Fire</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+						<tr class="feature even">	
+							<th>Teleport Location 1 - Load (on foot)</th>
+							<td>Jump + PrevWeapon</td>
+							<td></td>
+						</tr>
+						<tr class="feature even leg_new">	
+							<th>Teleport Location 1 - Save (on foot)</th>
+							<td>Jump + NextWeapon</td>
+							<td>(consistent-with/partner-to FOOT LOAD)</td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 1 - Load (in vehicle)</th>
+							<td>Handbrake + Radio</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 1 - Save (in vehicle)</th>
+							<td>Shoot + Radio</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 2 - Load (on foot)</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 2 - Save (on foot)</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 2 - Load (in vehicle)</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">	
+							<th>Teleport Location 2 - Save (in vehicle)</th>
+							<td class="disabled">(disabled)</td>
+							<td></td>
+						</tr>
+						<!-- -------------------------------------------------------------- -->
+					</table>
+				</div>
+
+				<h2>Default Feature States</h2>
+				<div class="doc_group_content">
+				
+					<p>Only one of these were ever different in Legacy/Limited compared to all the other variants. In this case the corresponding feature which allows 
+						the state to be changed at-will is now supported in Legacy/Limited.<br>
+						As such, the changes noted in the mockup below make it so all feature defaults are the same across all variants.<br>
+						Note that for any toggles, a save-game will remember the state they are in, so an undesirable default doesn't have to get in the way on each stunting session, as a save can be prepared/loaded with everything in a preferred state.</p>
+				
+					<table class="features_table">
+						<tr class="feature even">
+							<th>Feature</th>
+							<th>Default State</th>
+							<th>Notes on Changes/Additions</th>
+						</tr>
+						<tr class="feature">
+							<th>Player vulnerability</th>
+							<td>Invulnerable</td>
+							<td></td>
+						</tr>
+						<tr class="feature even">
+							<th>Vehicle vulnerability</th>
+							<td>Invulnerable</td>
+							<td></td>
+						</tr>
+						<tr>
+							<th>'Ghost Town'</th>
+							<td>Toggled Off</td>
+							<td></td>
+						</tr>
+						<tr>
+							<th>Weather</th>
+							<td>Locked at 'Extra Sunny'</td>
+							<td></td>
+						</tr>
+						<tr>
+							<th>Time</th>
+							<td>Frozen at Midday</td>
+							<td></td>
+						</tr>
+						<tr class="leg_diff">
+							<th>Wanted Level</th>
+							<td>0 Stars (Player Ignored by NPCs)</td>
+							<td>(used to be 'Player Not Ignored', which seems irrelevant now that you can manually opt-in to that behaviour with the via the Wanted Level feature)</td>
+						</tr>
+						<tr>
+							<th>Prior vehicle preference</th>
+							<td>Last vehicle</td>
+							<td></td>
+						</tr>
+						<tr>
+							<th>Always cut replay on teleport load</th>
+							<td>Off</td>
+							<td></td>
+						</tr>
+						<tr>
+							<th>Stats Overlay</th>
+							<td>Off</td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+				
+				<h2>Automatic Features</h2>
+				<div class="doc_group_content">
+					<ul>
+						<li>Unlimited Player Health/Armour (includes not being decreased by Fire)</li>
+						<li>Unlimited Player Sprint</li>
+						<li>Player cannot be carjacked <span class="leg_diff">(this used to not be true of Legacy/Limited variant, I have no idea why, so now its consistent with everyone else)</span></li>
+						<li>Perfect Weapon Accuracy</li>
+						<li>Taxi Boost &amp; Nitro available (press Horn while driving for Boost/Jump)</li>
+						<li>"Unique Jump" slow-motion/camera removed</li>
+						<li>Various object pickups (rampages, hidden packages, etc) removed</li>
+					</ul>
+				</div>
+			</section>
+			
+		</div>
+	</body>
+</html>
