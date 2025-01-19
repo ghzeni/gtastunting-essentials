@@ -1,8 +1,10 @@
 ﻿# GTAStunting Essentials
 
-## Welcome! This is a repository containing most of what you'll need to stunt!
+## Bem-vindo! Esse é um repositório (tipo um site) que contém quase rtudo que você vai precisar pra stuntar!
 
-The essential tools for each game are separated by branches. 
+As ferramentas disponíveis aqui não facilitam o processo de landar um stunt, apenas encurtam o tempo entre tentativas!
+
+Você pode encontrar as ferramentas de cada jogo nas branches do repositório ⬇️
 
 #### To get started, please select a branch 👇
 
