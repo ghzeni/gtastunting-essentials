@@ -4,9 +4,8 @@
 
 As ferramentas disponíveis aqui não facilitam o processo de landar um stunt, apenas encurtam o tempo entre tentativas!
 
-Você pode encontrar as ferramentas de cada jogo nas branches do repositório ⬇️
+### Você pode encontrar as ferramentas de cada jogo nas branches do repositório 👇
 
-#### To get started, please select a branch 👇
 
 ![image](https://github.com/ghzeni/gtastunting-essentials/assets/15947263/db6177ea-e510-4ae3-ae99-5c2d64ba32df)
 
